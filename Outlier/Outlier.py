@@ -1,7 +1,7 @@
 from sklearn.cluster import KMeans
 import matplotlib.pyplot as plt
-import Data as dataset
-import Helper as helper
+import data as dataset
+import helper as helper
 
 class Outlier:
     def artist(self,artist,x_discriminator,y_discriminator = None):

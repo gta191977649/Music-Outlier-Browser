@@ -26,9 +26,3 @@ class Outlier:
             label = labels[idx]
             plt.scatter(x=x, y=y,c=colors[label])
         plt.show()
-
-
-
-if __name__ == '__main__':
-    outlier = Outlier()
-    outlier.artist("Blue Oyster Cult",x_discriminator="tempo",y_discriminator="loudness")

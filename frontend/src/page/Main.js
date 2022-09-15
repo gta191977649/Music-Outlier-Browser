@@ -3,7 +3,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import Chart from '../widget/Chart'
 import KdeChart from '../widget/KdeChart'
 import CdfChart from '../widget/CdfChart';
-import CorrelationChart from '../widget/CorrelationChart';
+import ClusterChart from '../widget/ClusterChart';
 import axios from 'axios'
 import * as math from '../utils/math' 
 
@@ -17,8 +17,9 @@ function App() {
   ]
   const [query,setQuery] = useState([])
   const [result,setResult] = useState([])
+  const [clusterData,setClusterData] = useState([])
   const [selectedSong,setSelectedSong] = useState()
-  const [discriminator,setDiscriminator] = useState("tempo")
+  const [discriminator,setDiscriminator] = useState("loudness")
   const [limit,setLimit] = useState(1000)
   const [error,setError] = useState(false)
   const [bandwidth,setBandwith] = useState(0.1)
@@ -178,6 +179,7 @@ function App() {
     })
   }
   const doCluster = () => {
+    setClusterData([])
     const URL = "http://localhost:8000/api/cluster/"
     axios.post(URL,{
       "query":query,
@@ -186,10 +188,11 @@ function App() {
     .then(res => {
       const data = res.data;
       console.log("Cluster")
-      console.log(data)
+      setClusterData(data)
     })
     .catch((err) =>  {
         console.log(err)
+        setClusterData([])
     })
   }
 
@@ -198,9 +201,10 @@ function App() {
       <Chart data={result} discriminator={discriminator} onClick={onOutlierClicked}/>
       <CdfChart data={result} discriminator={discriminator} onClick={onKDEGraphClicked}/>
       <KdeChart data={result} discriminator={discriminator} bandwidth={bandwidth} onClick={onKDEGraphClicked} onZoomMoved={onDataZoomMoved}/>
-      <CorrelationChart data={result} features={FEATURES} discriminator={discriminator} onClick={onCorrelationClicked}/>
+      <ClusterChart data={clusterData} features={FEATURES} discriminator={discriminator} onClick={onCorrelationClicked}/>
     </React.Fragment>
-  },[result,discriminator])
+  },[result,clusterData,discriminator])
+  
   return (
     <div className="App mt-3">
       <div className="row">

@@ -2,8 +2,8 @@ import React, { useState ,useEffect} from 'react'
 import ReactEcharts from "echarts-for-react"; 
 import * as math from "../utils/math"
 
-export default function CorrelationChart(props) {
-    const [compareDiscriminator,setCompareDiscriminator] = useState("loudness")
+export default function ClusterChart(props) {
+    const [compareDiscriminator,setCompareDiscriminator] = useState("tempo")
     const [data,setData] = useState([])
     const [correlation,setCorrelation] = useState(0)
 
@@ -22,21 +22,39 @@ export default function CorrelationChart(props) {
     </select></div>
     //On Mount
     useEffect(()=> {
+        //console.log(props.data.data)
+        setData([])
         try {
-            let x = props.data.map(item=>item[compareDiscriminator])
-            let y = props.data.map(item=>item[props.discriminator])
+            let x = props.data.data.map(item=>item[compareDiscriminator])
+            let y = props.data.data.map(item=>item[props.discriminator])
             let d = []
             for(let i = 0; i < x.length; i++) {
                 d.push([x[i],y[i]])
             }
             console.log(d)
-            setData(d)
+            //setData(d)
+            setTimeout(function() {
+                setData(d)
+            },200)
             setCorrelation(math.correlation(x,y))
             
         }catch(e) {
             console.log(e)
         }
     },[props,compareDiscriminator])
+    const colors = [
+        '#c23531',
+        '#0984e3',
+        '#00b894',
+        '#a29bfe',
+        '#e84393',
+        '#e17055',
+        '#ca8622',
+        '#bda29a',
+        '#6e7074',
+        '#546570',
+        '#c4ccd3'
+    ]
 
     const op = {
         // title: {
@@ -60,8 +78,7 @@ export default function CorrelationChart(props) {
             },
             formatter: function (params) {
                 let idx = params[0]["dataIndex"]
-                let targetSong = props.data[idx]
-                
+                let targetSong = props.data.data[idx]
                 return `${targetSong["title"]}<br/> ${targetSong["artist"]}<br/>${params[0].value}`
             }
           },
@@ -76,7 +93,16 @@ export default function CorrelationChart(props) {
                 lineStyle: {color: '#0d6efd'},
                 itemStyle: {
                     normal:{
-                        color:"#0d6efd",
+                        color: function(e) {
+                            if (props.data.data !== undefined) {
+                                let idx = parseInt(e.dataIndex)
+                                console.log("idx",idx)
+                                let song = props.data.data[idx]
+                                if(song) return colors[song["label"]]
+                                else return "#0d6efd"
+                            }
+                            return "#0d6efd"
+                        },
                     }
                 }
             }

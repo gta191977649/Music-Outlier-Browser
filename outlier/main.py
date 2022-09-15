@@ -20,7 +20,9 @@ def doOutlierGraphGeneration(n,random=False):
 
 if __name__ == '__main__':
     outlier = Outlier()
-    #outliers = outlier.artist("Blue Oyster Cult",x_discriminator="tempo",y_discriminator="loudness")
-    #artists = ["Blue Oyster Cult", "Cyndi Lauper", "Frankie Valli"]
-    doOutlierGraphGeneration(100,True)
+    data = dataset.getDataFromArtist("Deadmau5")
+
+    result = outlier.cluster(method="mean_shift",data=data)
+    print(result)
+    #doOutlierGraphGeneration(100,True)
     

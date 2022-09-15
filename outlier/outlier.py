@@ -2,28 +2,60 @@ from ast import Delete
 from cgi import test
 from sklearn.cluster import KMeans
 import matplotlib.pyplot as plt
-from scipy.stats import gaussian_kde
-import data as dataset
-import helper as helper
+import outlier.data as dataset
 import numpy as np
-import config as CONF
+import outlier.config as CONF
 import seaborn as sns
-from sklearn.cluster import MeanShift
+from sklearn.cluster import MeanShift,estimate_bandwidth
 
 class Outlier:
 
-    def detect(self,method="mean_shift",data=[]):
+    def cluster(self,method="mean_shift",data=[],x_discriminator="tempo",y_discriminator="loudness"):
         algorithms = {
             "mean_shift": self.mean_shift,
         }
         if not method in algorithms: raise(Exception("Unknown detection algorithms!"))
-        data = np.array(data)
-        return algorithms[method](data)
+        # prepare data
+        x = np.array(list(map(lambda x: x[x_discriminator], data)),dtype=np.intc)
+        y = np.array(list(map(lambda y: y[y_discriminator], data)),dtype=np.intc)
+        processed_data = []
+        for i ,_ in enumerate(x):
+            processed_data.append([x[i],y[i]])
+        # do cluster
+        labels = algorithms[method](processed_data)
+        # remove conver int64 to 32 (prevent json response error for web services)
+        labels = list(map(lambda x: int(x), labels))
+        # attach label to data
+        for i,item in enumerate(data):
+            item["label"] = labels[i]
+        res = {
+            "n_of_clusters": len(np.unique(labels)),
+            "data":data,
+        }
+        return res
 
-    def mean_shift(self,data):
-        clustering = MeanShift(bandwidth=2).fit(data)
-        return clustering.labels_
-    def artist(self,artist,x_discriminator,y_discriminator = None):
+    def mean_shift(self,x):
+        # auto estimate bandwith
+        b = estimate_bandwidth(x)
+        print("Auto estimated bandwith =",b)
+        ms = MeanShift(bandwidth=b,bin_seeding=True).fit(x)
+        labels = ms.labels_
+        # # debug plot
+        # colors = sns.color_palette("Set2", len(x))
+        #
+        # print(len(labels))
+        # labels_unique = np.unique(labels)
+        # n_clusters_ = len(labels_unique)
+        #
+        # for i in range(len(x)):
+        #     plt.scatter(x=x[i][0],y=x[i][1],c=colors[labels[i]])
+        # plt.title("Estimated number of clusters: %d" % n_clusters_)
+        # plt.show()
+
+
+        return labels
+
+    def artist(self,artist,x_discriminator,y_discriminator):
         # Obtain data from dataset
         results = dataset.getDataFromArtist(artist)
         

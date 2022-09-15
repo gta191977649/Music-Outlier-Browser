@@ -24,9 +24,9 @@ function App() {
   const [bandwidth,setBandwith] = useState(0.1)
   const [sidebarFullScreen,setSidebarFullScreen] = useState(false)
 
-  // useEffect(()=>{
-  //   math.kde2d()
-  // },[])
+  useEffect(()=>{
+    doCluster()
+  },[result])
   
   // MAIN ------ CURD Functions For Query ------
   const updateQuery = (feature,criteria,val) => {
@@ -157,8 +157,8 @@ function App() {
 
 
   const searchSong = () => {
-    const URL = "./api/search/"
-    //const URL = "http://localhost:8000/api/search/"
+    //const URL = "./api/search/"
+    const URL = "http://localhost:8000/api/search/"
     axios.post(URL,{
       "query":query,
       "limit":limit,
@@ -175,6 +175,21 @@ function App() {
     .catch((err) =>  {
         console.log(err)
         setError(err.message)
+    })
+  }
+  const doCluster = () => {
+    const URL = "http://localhost:8000/api/cluster/"
+    axios.post(URL,{
+      "query":query,
+      "limit":limit,
+    })
+    .then(res => {
+      const data = res.data;
+      console.log("Cluster")
+      console.log(data)
+    })
+    .catch((err) =>  {
+        console.log(err)
     })
   }
 

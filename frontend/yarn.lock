@@ -2418,6 +2418,11 @@
     "@typescript-eslint/types" "5.33.0"
     eslint-visitor-keys "^3.3.0"
 
+"@uwdata/kde@^0.0.2":
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/@uwdata/kde/-/kde-0.0.2.tgz#48be0dcbd4c622eee3b97f28cb3668692603ecba"
+  integrity sha512-RF4U42TzML1MdPCAgOUegHELpjQRA4dkNO/IfOE+H9FF4EHLeA07BHjcEh1fKmzV/1B3cRVfJgIvTIqwpx7d9A==
+
 "@webassemblyjs/ast@1.11.1":
   version "1.11.1"
   resolved "https://registry.yarnpkg.com/@webassemblyjs/ast/-/ast-1.11.1.tgz#2bfd767eae1a6996f432ff7e8d7fc75679c0b6a7"

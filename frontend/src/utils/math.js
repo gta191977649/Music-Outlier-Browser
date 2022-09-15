@@ -1,5 +1,6 @@
 import NormalDistribution from 'normal-distribution'
 import * as ss from 'simple-statistics'
+import * as k from '@uwdata/kde'
 
 export function gauss_kernel(x) {
     return 1/Math.sqrt(2*Math.PI) * Math.exp(-0.5 * Math.pow(x,2))
@@ -56,4 +57,11 @@ export function cdf(data) {
 
 export function correlation(x,y) {
     return ss.sampleCorrelation(x,y)
+}
+
+export function kde2d() {
+    const data = [[1, 1], [1, 2], [5, 4], [5, 3], [6, 2], [8, 7]];
+    console.log("kde/....")
+    let d = k.density2d(data, { bandwidth: [1, 0.5], extent: [[1, 9], [1, 8]] })
+    return d.heatmap()
 }

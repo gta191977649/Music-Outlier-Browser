@@ -7,7 +7,6 @@ import CorrelationChart from '../widget/CorrelationChart';
 import axios from 'axios'
 import * as math from '../utils/math' 
 
-
 function App() {
 
   const FEATURES = [
@@ -25,7 +24,9 @@ function App() {
   const [bandwidth,setBandwith] = useState(0.1)
   const [sidebarFullScreen,setSidebarFullScreen] = useState(false)
 
-  
+  // useEffect(()=>{
+  //   math.kde2d()
+  // },[])
   
   // MAIN ------ CURD Functions For Query ------
   const updateQuery = (feature,criteria,val) => {
@@ -156,8 +157,8 @@ function App() {
 
 
   const searchSong = () => {
-    //const URL = "./api/search/"
-    const URL = "http://localhost:8000/api/search/"
+    const URL = "./api/search/"
+    //const URL = "http://localhost:8000/api/search/"
     axios.post(URL,{
       "query":query,
       "limit":limit,
@@ -263,7 +264,7 @@ function App() {
 
             
           </div>
-          
+        
         </div>
       </div>
       

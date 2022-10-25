@@ -1,9 +1,10 @@
 import matplotlib.pyplot as plt
 import numpy as np
-import data as dataset
-import config as CONF
-import helper as helper
+import outlier.data as dataset
+import outlier.config as CONF
+import outlier.helper as helper
 import seaborn as sns
+import os
 
 def generateArtistGraph(artists,x_discriminator="tempo",y_discriminator="loudness"):
     for artist in artists:

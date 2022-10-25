@@ -1,6 +1,7 @@
 from sklearn.cluster import KMeans
 import matplotlib.pyplot as plt
 import numpy as np
+import seaborn as sns
 
 def plotElbowMethodTest(data,min_k,max_k):
     n_of_clusters = range(min_k, max_k)
@@ -21,6 +22,18 @@ def plotScatterGraph(data,x_discriminator="tempo",y_discriminator="loudness"):
     plt.scatter(x, y)
     plt.show()
 
+def plotScatterClusterGraph(labels,x):
+    # debug plot
+    colors = sns.color_palette("Set2", len(x))
+
+    print(len(labels))
+    labels_unique = np.unique(labels)
+    n_clusters_ = len(labels_unique)
+
+    for i in range(len(x)):
+        plt.scatter(x=x[i][0],y=x[i][1],c=colors[labels[i]])
+    plt.title("Estimated number of clusters: %d" % n_clusters_)
+    plt.show()
 def findOptimalKByElbowMethod(data,min_k,max_k):
     return False
 

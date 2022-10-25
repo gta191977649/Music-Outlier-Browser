@@ -70,17 +70,18 @@ export default function KdeChart(props) {
    
     return (
         <React.Fragment>
-            {x.length > 0 ? <ReactEcharts option={op} 
-        onEvents={{
-            click: props.onClick,
-            datazoom: (e) => {
-                let startIdx = Math.floor((e.start * 0.01) * (x.length-1))
-                let endIdx = Math.floor((e.end * 0.01) * (x.length-1))
-                let start = x[startIdx] 
-                let end = x[endIdx] 
-                
-                props.onZoomMoved(start,end)
-            } ,
+            {x.length > 0 ? <ReactEcharts 
+            option={op} 
+            onEvents={{
+                click: props.onClick,
+                datazoom: (e) => {
+                    let startIdx = Math.floor((e.start * 0.01) * (x.length-1))
+                    let endIdx = Math.floor((e.end * 0.01) * (x.length-1))
+                    let start = x[startIdx] 
+                    let end = x[endIdx] 
+                    
+                    props.onZoomMoved(start,end)
+                } ,
         }}
         /> : ""}
         </React.Fragment>

@@ -181,6 +181,7 @@ function App() {
   const doCluster = () => {
     setClusterData([])
     const URL = "http://localhost:8000/api/cluster/"
+    //const URL = "./api/cluster/"
     axios.post(URL,{
       "query":query,
       "limit":limit,
@@ -209,7 +210,7 @@ function App() {
     <div className="App mt-3">
       <div className="row">
 
-        <div className={sidebarFullScreen ?"col-12 side-bar" :"col-3 side-bar"}>
+        <div className={sidebarFullScreen ? "col-12 side-bar" :"col-3 side-bar"}>
           <div className="form-check form-switch m-3">
             <input className="form-check-input" type="checkbox" role="switch" value={sidebarFullScreen} onChange={(e)=>{
               setSidebarFullScreen(e.target.checked)

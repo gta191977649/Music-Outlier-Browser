@@ -3,17 +3,17 @@ from cgi import test
 from sklearn.cluster import KMeans
 import matplotlib.pyplot as plt
 import outlier.data as dataset
+import outlier.helper as helper
 import numpy as np
 import outlier.config as CONF
-import seaborn as sns
 from sklearn.cluster import MeanShift,estimate_bandwidth
 
 class Outlier:
-
     def cluster(self,method="mean_shift",data=[],x_discriminator="tempo",y_discriminator="loudness"):
         algorithms = {
             "mean_shift": self.mean_shift,
         }
+
         if not method in algorithms: raise(Exception("Unknown detection algorithms!"))
         # prepare data
         x = np.array(list(map(lambda x: x[x_discriminator], data)),dtype=np.intc)
@@ -32,6 +32,8 @@ class Outlier:
             "n_of_clusters": len(np.unique(labels)),
             "data":data,
         }
+        # debug plot
+        #helper.plotScatterClusterGraph(labels,processed_data)
         return res
 
     def mean_shift(self,x):
@@ -40,25 +42,11 @@ class Outlier:
         print("Auto estimated bandwith =",b)
         ms = MeanShift(bandwidth=b,bin_seeding=True).fit(x)
         labels = ms.labels_
-        # # debug plot
-        # colors = sns.color_palette("Set2", len(x))
-        #
-        # print(len(labels))
-        # labels_unique = np.unique(labels)
-        # n_clusters_ = len(labels_unique)
-        #
-        # for i in range(len(x)):
-        #     plt.scatter(x=x[i][0],y=x[i][1],c=colors[labels[i]])
-        # plt.title("Estimated number of clusters: %d" % n_clusters_)
-        # plt.show()
-
-
         return labels
 
-    def artist(self,artist,x_discriminator,y_discriminator):
+    def artist(self,artist,x_discriminator="tempo",y_discriminator="loudness"):
         # Obtain data from dataset
         results = dataset.getDataFromArtist(artist)
-        
         # Processing Data and normalisation
         x = np.array(list(map(lambda x: x[x_discriminator] , results)))
         x_1 = (x-np.mean(x))/np.std(x)
@@ -82,26 +70,20 @@ class Outlier:
         
         # Generate outliers
         anomalies = []
-        idx = 0
-        neg_data = []
-        for outlier in dist:
+        for idx,outlier in enumerate(dist):
             if outlier > upper_limit or outlier < lower_limit:
-                anomalies.append(outlier)
-                neg_data.append(data[idx])
-                np.delete(data,idx)
-            idx += 1
-            
-        neg_data = np.array(neg_data)
-        pos_data = data
-        
-        # Plot Result
-        colors = ["#B2A4FF","#FF0000"]
-        # Positive data
-        plt.scatter(pos_data[:,0],pos_data[:,1],color=colors[0])
-        # Negative data
-        plt.scatter(neg_data[:,0],neg_data[:,1],color=colors[1])
-        plt.show()
-       
+                #anomalies.append(outlier)
+                anomalies.append(results[idx]["id"])
+
+
+        # # Plot Result
+        # colors = ["#B2A4FF","#FF0000"]
+        # # Positive data
+        # plt.scatter(pos_data[:,0],pos_data[:,1],color=colors[0])
+        # # Negative data
+        # plt.scatter(neg_data[:,0],neg_data[:,1],color=colors[1])
+        # plt.show()
+        #
 
         # Plot Result
         # colors = ["#B2A4FF","#FFB4B4"]

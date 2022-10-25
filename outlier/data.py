@@ -1,4 +1,8 @@
 import sqlite3
+import outlier.config as CONF
+import pathlib
+import seaborn as sns
+
 from unittest import result
 
 def dictfetchall(cursor):
@@ -10,7 +14,8 @@ def dictfetchall(cursor):
     ]
 
 def executeSQL(sql,params = None):
-    conn = sqlite3.connect("../db.sqlite3")
+    path = "{}/{}".format(pathlib.Path().resolve(),CONF.DB_PATH)
+    conn = sqlite3.connect(path)
     c = conn.cursor()
     if params: c.execute(sql,params)
     else: c.execute(sql)

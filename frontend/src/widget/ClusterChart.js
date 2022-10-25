@@ -70,7 +70,7 @@ export default function ClusterChart(props) {
         },
         yAxis: {
         },
-        
+       
         tooltip: {
             trigger: 'axis',
             axisPointer: {
@@ -114,6 +114,8 @@ export default function ClusterChart(props) {
             <h6>Correlation Analysis</h6>
             {renderDiscriminatorSelect}
             <ReactEcharts option={op} 
+            style={props.style}
+
             onEvents={{
                 click: props.onClick,
             }}

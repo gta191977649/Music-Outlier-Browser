@@ -9,6 +9,7 @@ import outlier.result as output
 import pandas as pd
 import outlier.config as CONF
 from tqdm import tqdm
+import seaborn as sns
 
 # Do outlier detection for each artist
 def doOutlierDetection():
@@ -58,9 +59,12 @@ def generateOutlierDetection():
     print(output)
 
 if __name__ == '__main__':
+    #print(np.random.rand(10, 10))
     outlier = OutlierDetection.Outlier()
-    data = dataset.getDataFromArtist("Deadmau5")
-    generateOutlierDetection()
+    #data = dataset.getDataFromArtist("Deadmau5")
+    #generateOutlierDetection()
 
-    #doOutlierGraphGeneration(100,True)
-    
+    artist_list = dataset.getAllArtistList(min=10)[:10]
+    #print(artist_list)
+    #result.generateAllGraph(artist_list)
+    result.generateAllGraph(["Deadmau5","Blue Oyster Cult"])

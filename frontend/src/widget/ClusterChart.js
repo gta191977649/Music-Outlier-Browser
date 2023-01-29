@@ -57,9 +57,7 @@ export default function ClusterChart(props) {
     ]
 
     const op = {
-        // title: {
-        //     text: 'Cumulative Distribution'
-        // },
+      
         grid: {
             top:50,
             bottom:70,
@@ -84,7 +82,7 @@ export default function ClusterChart(props) {
           },
         series: [
             {
-                symbolSize: 5,
+                symbolSize: 4,
                 // symbolSize: function (dataItem) {
                 //     return dataItem[1] * 0.3;
                 // },

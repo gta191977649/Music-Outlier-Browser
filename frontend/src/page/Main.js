@@ -143,6 +143,7 @@ function App() {
   const onCorrelationClicked = (e) => {
     let idx = e["dataIndex"]
     let targetSong = result[idx]
+    console.log(targetSong)
     setSelectedSong([targetSong])
   }
 
@@ -158,8 +159,8 @@ function App() {
 
 
   const searchSong = () => {
-    //const URL = "./api/search/"
-    const URL = "http://localhost:8000/api/search/"
+    const URL = "./api/search/"
+    //const URL = "http://localhost:8000/api/search/"
     axios.post(URL,{
       "query":query,
       "limit":limit,
@@ -180,8 +181,8 @@ function App() {
   }
   const doCluster = () => {
     setClusterData([])
-    const URL = "http://localhost:8000/api/cluster/"
-    //const URL = "./api/cluster/"
+    //const URL = "http://localhost:8000/api/cluster/"
+    const URL = "./api/cluster/"
     axios.post(URL,{
       "query":query,
       "limit":limit,

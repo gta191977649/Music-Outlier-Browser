@@ -1,14 +1,15 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 import outlier.data as dataset
 import outlier.config as CONF
 import outlier.helper as helper
 import seaborn as sns
 import outlier.calc as calc
 from scipy import stats
-
+from sklearn.neighbors import KernelDensity
 import os
-
+MAX_TEMPO = 200
 def generateArtistGraph(artists,x_discriminator="tempo",y_discriminator="loudness"):
     for artist in artists:
         data = dataset.getDataFromArtist(artist)
@@ -44,17 +45,40 @@ def generateArtistHeatMap(artists,x_discriminator="tempo",y_discriminator="loudn
         plt.savefig(path)
         plt.close()
 
-def generateAllGraph(artists,x_discriminator="tempo"):
-    tempo_max = 200
-    #tempo = np.linspace(0, 200, num=tempo_max)
-    kde_map = np.zeros([len(artists),tempo_max])
+def generateArtistsHeatMap(artists,x_discriminator="tempo",title=None):
+    MAX_TEMPO = 50
+
+    kde_map = np.zeros([len(artists),MAX_TEMPO])
     #artist_id = np.linspace(0, len(artists), num=len(artists))
     for i,artist in enumerate(artists):
         data = dataset.getDataFromArtist(artist)
         if not data : return print("无效的作曲家ID")
         x = np.array(list(map(lambda x: x[x_discriminator], data)))
-        _, kde_y = calc.kde(x,n=tempo_max)
+        _, kde_y = calc.kde(x,n=MAX_TEMPO)
         kde_map[i,:] = kde_y
+
+    # Draw
+    df = pd.DataFrame(kde_map, index=artists)
+    ax = sns.heatmap(df.transpose(),annot=False)
+    ax.invert_yaxis()
+    plt.title(title + " ("+str(len(artists))+")")
+    plt.xlabel('Artist ID')
+    plt.ylabel('Tempo')
+    plt.show()
+def generateArtistHeatMap(artist,x_discriminator="tempo"):
+    MAX_TEMPO = 200
+
+    kde_map = np.zeros([1,MAX_TEMPO])
+    data = dataset.getDataFromArtist(artist)
+    if not data : return print("无效的作曲家ID")
+    x = np.array(list(map(lambda x: x[x_discriminator], data)))
+    #y = np.array(list(map(lambda y: y[y_discriminator], data)))
+
+    #coord = np.zeros([len(x),2])
+    #for j in range(0,len(x)): coord[j] = [x[j],y[j]]
+
+    _, kde_y = calc.kde(x,n=MAX_TEMPO)
+    kde_map[0,:] = kde_y
 
 
     # Draw
@@ -63,15 +87,28 @@ def generateAllGraph(artists,x_discriminator="tempo"):
     plt.xlabel('Artist ID')
     plt.ylabel('Tempo')
     plt.show()
+def generateAllArtistGraph(artists,x_discriminator="tempo",y_discriminator="loudness"):
+    for i,artist in enumerate(artists):
+        data = dataset.getDataFromArtist(artist)
+        if not data : return print("无效的作曲家ID")
+        x = np.array(list(map(lambda x: x[x_discriminator], data)))
+        y = np.array(list(map(lambda y: y[y_discriminator], data)))
 
-    artist_id = 5
-    #buffer.append([x_mean])
+        plt.scatter(x,y)
+    plt.show()
+def generateAllArtistKdeGraph(artists,discriminator="tempo"):
+    for i, artist in enumerate(artists):
+        data = dataset.getDataFromArtist(artist)
+        if not data: return print("无效的作曲家ID")
+        x = dataset.getDataFromArtistByFeatureDiscriminator(artist,discriminator,filterNoise=True)
+        #sns.kdeplot(x)
+        print(x)
+        x,y = calc.kde(x,n=MAX_TEMPO)
+        plt.plot(x,y)
 
+    plt.title("KDE - "+discriminator)
+    plt.show()
 
-
-    # Draw
-    #data = np.array([x,y])
-    #print(data)
-    #sns.heatmap(buffer,annot=True)
-    #data = []
-    #plt.show()
+def generateGenreHeatMap(genre,discriminator="tempo"):
+    artists_list = dataset.getArtistsByGenre(genre)
+    generateArtistsHeatMap(artists_list, x_discriminator=discriminator, title=genre.upper())

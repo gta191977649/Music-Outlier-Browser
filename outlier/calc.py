@@ -13,8 +13,8 @@ def get_kde(x,data,kernel,bandwidth):
     return res
 
 # KDE calculation
-def kde(data,kernel=gauss_kernel,bandwidth=0.1,n=50):
-    x = np.linspace(min(data),max(data),num=n)
+def kde(data,kernel=gauss_kernel,bandwidth=0.4,n=50):
+    x = np.linspace(-50,0,num=n)
     y = []
     for i in range (0,len(x)):
         val = get_kde(x[i], data, kernel, bandwidth)

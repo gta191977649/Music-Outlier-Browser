@@ -67,4 +67,8 @@ if __name__ == '__main__':
     artist_list = dataset.getAllArtistList(min=10)[:10]
     #print(artist_list)
     #result.generateAllGraph(artist_list)
-    result.generateAllGraph(["Deadmau5","Blue Oyster Cult"])
+    #result.generateAllArtistGraph(artist_list)
+    #result.generateArtistsHeatMap(['Deadmau5','Benga','Blue Six','Bug'z In The Attic'],x_discriminator="tempo",title="Dance & Electronica")
+    result.generateGenreHeatMap("hip-hop", discriminator="loudness")
+    #result.generateArtistHeatMap('Deadmau5',x_discriminator="tempo")
+    #result.generateAllArtistKdeGraph(artist_list,discriminator="tempo")

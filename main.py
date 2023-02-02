@@ -26,8 +26,6 @@ def doOutlierGraphGeneration(n,random=False):
 
     artists = dataset.getAllArtistList(min=10)
     result.generateArtistHeatMap(artists)
-
-
     # print(artists)
     #output.generateArtistHeatMap(artists)
     #doOutlierDetection()
@@ -60,15 +58,20 @@ def generateOutlierDetection():
 
 if __name__ == '__main__':
     #print(np.random.rand(10, 10))
-    outlier = OutlierDetection.Outlier()
+    #outlier = OutlierDetection.Outlier()
     #data = dataset.getDataFromArtist("Deadmau5")
     #generateOutlierDetection()
 
-    artist_list = dataset.getAllArtistList(min=10)[:10]
+
     #print(artist_list)
     #result.generateAllGraph(artist_list)
     #result.generateAllArtistGraph(artist_list)
     #result.generateArtistsHeatMap(['Deadmau5','Benga','Blue Six','Bug'z In The Attic'],x_discriminator="tempo",title="Dance & Electronica")
-    result.generateGenreHeatMap("hip-hop", discriminator="loudness")
-    #result.generateArtistHeatMap('Deadmau5',x_discriminator="tempo")
-    #result.generateAllArtistKdeGraph(artist_list,discriminator="tempo")
+    #result.generateGenreHeatMap("hip-hop", discriminator="loudness")
+    # artist_list = dataset.getAllArtistList(min=10)[:10]
+    artist_list = [
+        "Deadmau5",
+        "Blue Oyster Cult",
+        "Blue Six",
+    ]
+    result.generateInteractionPlotFromArtistList(artist_list)

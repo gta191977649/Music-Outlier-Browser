@@ -6,6 +6,11 @@ import outlier.config as CONF
 import outlier.helper as helper
 import seaborn as sns
 import outlier.calc as calc
+import tkinter as tk
+from tkinter import scrolledtext
+
+from matplotlib.backend_bases import MouseButton
+
 from scipy import stats
 from sklearn.neighbors import KernelDensity
 import os
@@ -112,3 +117,18 @@ def generateAllArtistKdeGraph(artists,discriminator="tempo"):
 def generateGenreHeatMap(genre,discriminator="tempo"):
     artists_list = dataset.getArtistsByGenre(genre)
     generateArtistsHeatMap(artists_list, x_discriminator=discriminator, title=genre.upper())
+
+def generateInteractionPlotFromArtistList(artists,dx="tempo",dy="loudness"):
+    fig, ax = plt.subplots(picker=True)
+    for i, artist in enumerate(artists):
+        # get song info
+        data = dataset.getDataFromArtist(artist)
+        x = dataset.getDataFromArtistByFeatureDiscriminator(artist,dx,filterNoise=False)
+        y = dataset.getDataFromArtistByFeatureDiscriminator(artist,dy,filterNoise=False)
+        plt.scatter(x,y,s=10)
+
+
+    def onclick(event):
+        print(event)
+    cid = fig.canvas.mpl_connect("pick_event", onclick)
+    plt.show()

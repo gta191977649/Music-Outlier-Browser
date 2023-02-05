@@ -70,8 +70,9 @@ if __name__ == '__main__':
     #result.generateGenreHeatMap("hip-hop", discriminator="loudness")
     # artist_list = dataset.getAllArtistList(min=10)[:10]
     artist_list = [
-        "Deadmau5",
         "Blue Oyster Cult",
-        "Blue Six",
+        "MNEMIC",
+        "Colin Meloy",
+        "Rod Lee"
     ]
     result.generateInteractionPlotFromArtistList(artist_list)

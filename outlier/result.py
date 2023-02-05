@@ -8,6 +8,8 @@ import seaborn as sns
 import outlier.calc as calc
 import tkinter as tk
 from tkinter import scrolledtext
+import webbrowser
+import matplotlib.cm as cm
 
 from matplotlib.backend_bases import MouseButton
 
@@ -118,17 +120,95 @@ def generateGenreHeatMap(genre,discriminator="tempo"):
     artists_list = dataset.getArtistsByGenre(genre)
     generateArtistsHeatMap(artists_list, x_discriminator=discriminator, title=genre.upper())
 
+"""
 def generateInteractionPlotFromArtistList(artists,dx="tempo",dy="loudness"):
-    fig, ax = plt.subplots(picker=True)
+    data = []
+
+    fig, ax = plt.subplots()
+    x = []
+    y = []
+    group = []
     for i, artist in enumerate(artists):
         # get song info
-        data = dataset.getDataFromArtist(artist)
-        x = dataset.getDataFromArtistByFeatureDiscriminator(artist,dx,filterNoise=False)
-        y = dataset.getDataFromArtistByFeatureDiscriminator(artist,dy,filterNoise=False)
-        plt.scatter(x,y,s=10)
+        info = dataset.getDataFromArtist(artist)
+        data += info
+        px = list(map(lambda x: x[dx], info))
+        py = list(map(lambda y: y[dy], info))
+        x += px
+        y += py
+        for j in range(0,len(info)):
+            group.append(i)
 
+        sns.kdeplot(x=px, y=py, bw_adjust=0.5, levels=2)
+
+    print(group)
+    ax.scatter(x,y,c=group,s=15,picker=True)
+
+
+    plt.legend()
 
     def onclick(event):
-        print(event)
+
+        song_index = event.ind[0]
+        song = data[song_index]
+        # show window
+        root = tk.Tk()
+        root.title("Dataviewer - "+song['id'])
+        text = scrolledtext.ScrolledText(root, wrap=tk.WORD)
+        text.insert(tk.INSERT, "Title:{}\nArtist:{}\nLoudness:{}\nTempo:{}".format(song['title'],song['artist'],\
+                                                                                   song['loudness'],song['tempo']))
+        text.pack(fill=tk.BOTH, expand=True)
+        button = tk.Button(root, text="Find it on youtube", \
+                           command=lambda: webbrowser.open("https://www.youtube.com/results?search_query={}"\
+                                                           .format(song['title']+' - '+song['artist'])))
+        button.pack(side=tk.BOTTOM, fill=tk.X, expand=True)
+
+        root.mainloop()
+
+
+    cid = fig.canvas.mpl_connect("pick_event", onclick)
+    plt.show()
+"""
+def generateInteractionPlotFromArtistList(artists,dx="tempo",dy="loudness"):
+    data = []
+    fig, ax = plt.subplots()
+    x = []
+    y = []
+    #cmap = plt.get_cmap("Paired", 10)
+    #colors =cmap(np.linspace(0, 1, 10))
+    colors = ['limegreen','blue','red','tab:purple']
+    group = []
+    for i, artist in enumerate(artists):
+        # get song info
+        info = dataset.getDataFromArtist(artist)
+        data += info
+        px = list(map(lambda x: x[dx], info))
+        py = list(map(lambda y: y[dy], info))
+        x += px
+        y += py
+        for j in range(0, len(info)):
+            group.append(colors[i])
+
+        #sns.kdeplot(x=px,y=py,c=colors[i] ,bw_adjust=0.5, levels=2)
+        ax.scatter(x, y,c=colors[i],s=10,label=artist)
+    print(group)
+    ax.scatter(x, y, c=group,cmap="Set2", s=15, picker=True)
+    plt.legend()
+    def onclick(event):
+        song_index = event.ind[0]
+        song = data[song_index]
+        # show window
+        root = tk.Tk()
+        root.title("Dataviewer - " + song['id'])
+        text = scrolledtext.ScrolledText(root, wrap=tk.WORD)
+        text.insert(tk.INSERT, "Title:{}\nArtist:{}\nLoudness:{}\nTempo:{}".format(song['title'], song['artist'], \
+                                                                                   song['loudness'], song['tempo']))
+        text.pack(fill=tk.BOTH, expand=True)
+        button = tk.Button(root, text="Find it on youtube", \
+                           command=lambda: webbrowser.open("https://www.youtube.com/results?search_query={}" \
+                                                           .format(song['title'] + ' - ' + song['artist'])))
+        button.pack(side=tk.BOTTOM, fill=tk.X, expand=True)
+        root.mainloop()
+
     cid = fig.canvas.mpl_connect("pick_event", onclick)
     plt.show()

@@ -37,6 +37,7 @@ def generateArtistHeatMap(artists,x_discriminator="tempo",y_discriminator="loudn
         # Draw
         #sns.displot(x=x, kind="kde")
         g = sns.kdeplot(x=x,y=y,bw_adjust=0.4,levels=1)
+
         data = []
         for i in g.get_children():
             print(i.__class__.__name__)

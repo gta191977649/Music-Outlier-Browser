@@ -23,13 +23,25 @@ def graphLabel(clusters,dx="tempo",dy="loudness"):
     plt.show()
 
 def graphOutlier(clusters,dx="tempo",dy="loudness"):
-    colors = ['red', 'blue', 'green', 'orange', 'purple', 'yellow', 'pink']
-    # group chart
+    colors = ['blue',  'orange','green', 'purple', 'yellow', 'pink']
+    labels = []
+    for item in clusters["data"]:
+        label = item["label"]
+        labels.append(label)
+
+    unique, counts = np.unique(labels, return_counts=True)
+    occurrences = dict(zip(unique, counts))
+    outlier_label = min(occurrences, key=lambda x: occurrences[x])
+    print("label {} cluster is outlier".format(outlier_label))
+    # draw graph with outlier
     for item in clusters["data"]:
         x = item[dx]
         y = item[dy]
         label = item["label"]
         plt.scatter(x=x,y=y,c=colors[label])
+
+        if label == outlier_label:
+            plt.scatter(x=x,y=y,marker='x',color="red",s=80)
 
     plt.show()
 
@@ -109,13 +121,16 @@ if __name__ == '__main__':
         "MNEMIC",
         "Colin Meloy",
         "Rod Lee",
-        "Blue Six"
+        "Blue Six",
+        "Chris Clark",
+        "Deadmau5"
     ]
     # Do cluster
     outlier = OutlierDetection.Outlier()
-    data = dataset.getDataFromArtist("Blue Six")
+    data = dataset.getDataFromArtist("MNEMIC")
     clusters = outlier.cluster("gmm", data,n_components=2)
-    graphLabel(clusters)
+    #graphLabel(clusters)
+    graphOutlier(clusters)
 
     #outlierDetectionGMM("Colin Meloy")
     #outlierDetectionGMM("Blue Six")

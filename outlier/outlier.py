@@ -7,11 +7,13 @@ import outlier.helper as helper
 import numpy as np
 import outlier.config as CONF
 from sklearn.cluster import MeanShift,estimate_bandwidth
+from sklearn.mixture import GaussianMixture
 
 class Outlier:
-    def cluster(self,method="mean_shift",data=[],x_discriminator="tempo",y_discriminator="loudness"):
+    def cluster(self,method="mean_shift",data=[],x_discriminator="tempo",y_discriminator="loudness",n_components=2):
         algorithms = {
             "mean_shift": self.mean_shift,
+            "gmm":self.gmm,
         }
 
         if not method in algorithms: raise(Exception("Unknown detection algorithms!"))
@@ -22,7 +24,7 @@ class Outlier:
         for i ,_ in enumerate(x):
             processed_data.append([x[i],y[i]])
         # do cluster
-        labels = algorithms[method](processed_data)
+        labels = algorithms[method](processed_data,n_components=n_components)
         # remove conver int64 to 32 (prevent json response error for web services)
         labels = list(map(lambda x: int(x), labels))
         # attach label to data
@@ -43,7 +45,12 @@ class Outlier:
         ms = MeanShift(bandwidth=b,bin_seeding=True).fit(x)
         labels = ms.labels_
         return labels
-
+    def gmm(self,x,n_components=2):
+        x = np.array(x)
+        gm = GaussianMixture(n_components=n_components,covariance_type="diag")
+        gm.fit(x)
+        labels = gm.predict(x)
+        return labels
     def artist(self,artist,x_discriminator="tempo",y_discriminator="loudness"):
         # Obtain data from dataset
         results = dataset.getDataFromArtist(artist)

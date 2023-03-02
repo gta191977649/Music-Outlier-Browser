@@ -58,7 +58,7 @@ def generateOutlierDetection():
 
 if __name__ == '__main__':
     #print(np.random.rand(10, 10))
-    #outlier = OutlierDetection.Outlier()
+    outlier = OutlierDetection.Outlier()
     #data = dataset.getDataFromArtist("Deadmau5")
     #generateOutlierDetection()
 
@@ -69,6 +69,9 @@ if __name__ == '__main__':
     #result.generateArtistsHeatMap(['Deadmau5','Benga','Blue Six','Bug'z In The Attic'],x_discriminator="tempo",title="Dance & Electronica")
     #result.generateGenreHeatMap("hip-hop", discriminator="loudness")
     # artist_list = dataset.getAllArtistList(min=10)[:10]
+
+
+
     artist_list = [
         "Blue Oyster Cult",
         "MNEMIC",

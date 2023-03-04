@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import matplotlib as mpl
 import pandas as pd
 import outlier.outlier as OutlierDetection
 import outlier.data as dataset
@@ -12,6 +13,7 @@ import outlier.config as CONF
 from tqdm import tqdm
 import seaborn as sns
 from matplotlib.colors import ListedColormap
+import mpltex
 
 def graphLabel(clusters,dx="tempo",dy="loudness"):
     colors = ['red', 'blue', 'green', 'orange', 'purple', 'yellow', 'pink']
@@ -23,7 +25,46 @@ def graphLabel(clusters,dx="tempo",dy="loudness"):
     plt.show()
 
 def graphOutlier(clusters,dx="tempo",dy="loudness"):
+    mpl.rcParams['font.family'] = 'Times New Roman'
+    mpl.rcParams['font.size'] = 12
     colors = ['blue',  'orange','green', 'purple', 'yellow', 'pink']
+    labels = []
+    artist = clusters["data"][0]["artist"]
+    for item in clusters["data"]:
+        label = item["label"]
+        labels.append(label)
+
+    unique, counts = np.unique(labels, return_counts=True)
+    occurrences = dict(zip(unique, counts))
+    outlier_label = min(occurrences, key=lambda x: occurrences[x])
+    print("label {} cluster is outlier".format(outlier_label))
+    # draw graph with outlier
+    data = []
+    outliers = []
+    for item in clusters["data"]:
+        x = item[dx]
+        y = item[dy]
+        label = item["label"]
+        data.append([x,y])
+        #plt.scatter(x=x,y=y,color=colors)
+
+        if label == outlier_label:
+            outliers.append([x,y])
+    data = np.array(data)
+    outliers = np.array(outliers)
+
+    plt.scatter(x=data[:,0],y=data[:,1], color="blue")
+    plt.scatter(x=outliers[:,0],y=outliers[:,1],marker='x',color="red",s=100,label="Outlier")
+
+    plt.legend()
+    plt.title("Outliers: {} (k={})".format(artist,2))
+    plt.savefig("./chart/outliers/{}.png".format(artist))
+    plt.show()
+
+def findOutliersFromClusters(artist,dx="tempo",dy="loudness"):
+    outlier = OutlierDetection.Outlier()
+    data = dataset.getDataFromArtist(artist)
+    clusters = outlier.cluster("gmm", data, n_components=2)
     labels = []
     for item in clusters["data"]:
         label = item["label"]
@@ -34,17 +75,22 @@ def graphOutlier(clusters,dx="tempo",dy="loudness"):
     outlier_label = min(occurrences, key=lambda x: occurrences[x])
     print("label {} cluster is outlier".format(outlier_label))
     # draw graph with outlier
+    data = []
+    outliers = []
     for item in clusters["data"]:
         x = item[dx]
         y = item[dy]
         label = item["label"]
-        plt.scatter(x=x,y=y,c=colors[label])
+        data.append([x, y])
+        # plt.scatter(x=x,y=y,color=colors)
 
         if label == outlier_label:
-            plt.scatter(x=x,y=y,marker='x',color="red",s=80)
+            outliers.append([x, y])
+    data = np.array(data)
+    outliers = np.array(outliers)
+    return outliers,data
 
-    plt.show()
-
+@mpltex.acs_decorator
 def outlierDetectionGMM(artist,dx="tempo",dy="loudness"):
     data = dataset.getDataFromArtist(artist)
     x = np.array(list(map(lambda x: x[dx], data)))
@@ -66,14 +112,15 @@ def outlierDetectionGMM(artist,dx="tempo",dy="loudness"):
 
     #plt.hist(mahal_dist, bins=50, edgecolor='black')
 
-    # graph points
-    plt.scatter(x=x,y=y)
+    # graph
+
+    plt.scatter(x=x,y=y,color=mpltex.colors)
     # mark outliers
     #print(outliers.shape)
     for outlier in outliers:
         x = outlier[0]
         y = outlier[1]
-        plt.scatter(x=x, y=y,marker='x',color="red",s=100)
+        plt.scatter(x=x, y=y,marker='x',color="red",s=150)
     plt.title("{} - Outliers ({})".format(artist,len(outliers)))
     plt.show()
 
@@ -115,6 +162,40 @@ def gmm2(artist,dx="tempo",dy="loudness"):
     plt.show()
 
 
+def drawArtists():
+    mpl.rcParams['font.family'] = 'Times New Roman'
+    #mpl.rcParams['font.size'] = 10
+
+    fig, axs = plt.subplots(2, 2)
+    outliers,data = findOutliersFromClusters("Blue Oyster Cult")
+    axs[0,0].scatter(x=data[:,0],y=data[:,1],color="blue",s=10)
+    axs[0,0].scatter(x=outliers[:,0],y=outliers[:,1],marker='x',color="red",s=50,label="Outlier")
+    axs[0,0].set_title("Blue Oyster Cult (k=2)")
+    axs[0,0].legend()
+
+    outliers,data = findOutliersFromClusters("MNEMIC")
+    axs[0,1].scatter(x=data[:,0],y=data[:,1],color="blue",s=10)
+    axs[0,1].scatter(x=outliers[:,0],y=outliers[:,1],marker='x',color="red",s=50,label="Outlier")
+    axs[0, 1].set_title("MNEMIC (k=2)")
+    axs[0, 1].legend()
+
+    outliers,data = findOutliersFromClusters("Colin Meloy")
+    axs[1,0].scatter(x=data[:,0],y=data[:,1],color="blue",s=10)
+    axs[1,0].scatter(x=outliers[:,0],y=outliers[:,1],marker='x',color="red",s=50,label="Outlier")
+    axs[1,0].set_title("Colin Meloy (k=2)")
+    axs[1,0].legend()
+
+    outliers,data = findOutliersFromClusters("Rod Lee")
+    axs[1,1].scatter(x=data[:,0],y=data[:,1],color="blue",s=10)
+    axs[1,1].scatter(x=outliers[:,0],y=outliers[:,1],marker='x',color="red",s=50,label="Outlier")
+    axs[1, 1].set_title("Rod Lee (k=2)")
+    axs[1, 1].legend()
+
+    plt.subplots_adjust(hspace=0.5, wspace=0.5)
+    plt.savefig('myplot.png', dpi=300)
+
+    plt.show()
+
 if __name__ == '__main__':
     artist_list = [
         "Blue Oyster Cult",
@@ -127,10 +208,12 @@ if __name__ == '__main__':
     ]
     # Do cluster
     outlier = OutlierDetection.Outlier()
-    data = dataset.getDataFromArtist("MNEMIC")
+    data = dataset.getDataFromArtist("Colin Meloy")
     clusters = outlier.cluster("gmm", data,n_components=2)
     #graphLabel(clusters)
     graphOutlier(clusters)
 
     #outlierDetectionGMM("Colin Meloy")
     #outlierDetectionGMM("Blue Six")
+
+    #drawArtists()

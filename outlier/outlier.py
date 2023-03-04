@@ -38,7 +38,7 @@ class Outlier:
         #helper.plotScatterClusterGraph(labels,processed_data)
         return res
 
-    def mean_shift(self,x):
+    def mean_shift(self,x,n_components=None):
         # auto estimate bandwith
         b = estimate_bandwidth(x)
         print("Auto estimated bandwith =",b)
@@ -47,7 +47,7 @@ class Outlier:
         return labels
     def gmm(self,x,n_components=2):
         x = np.array(x)
-        gm = GaussianMixture(n_components=n_components,covariance_type="diag")
+        gm = GaussianMixture(n_components=n_components,covariance_type="diag",init_params="random_from_data")
         gm.fit(x)
         labels = gm.predict(x)
         return labels

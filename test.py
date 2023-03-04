@@ -1,32 +1,30 @@
 import seaborn as sns
 import matplotlib.pyplot as plt
+import numpy as np
 from sklearn.cluster import KMeans
+def plot_subplots(N):
+    # Generate some sample data
+    x = np.linspace(0, 10, 100)
+    y = np.sin(x)
 
-# Load the data
-tips = sns.load_dataset("tips")
+    # Calculate the number of rows and columns
+    nrows = N // 2
+    ncols = N // 2 + N % 2
 
-# Plot the 2D kernel density estimate of the data
-sns.kdeplot(x="total_bill", y="tip", data=tips,levels=1)
+    # Create a grid of subplots
+    fig, axs = plt.subplots(nrows=nrows, ncols=ncols)
 
-# Cluster the data points using KMeans
-X = tips[["total_bill", "tip"]]
-kmeans = KMeans(n_clusters=3, random_state=0).fit(X)
+    # Flatten the axs array to simplify the loop
+    axs = axs.ravel()
 
-# Get the labels for each data point
-labels = kmeans.labels_
+    # Loop over the subplots and plot the data
+    for i in range(N):
+        axs[i].plot(x, y)
+        axs[i].set_title(f'Plot {i+1}')
 
-# Plot the clusters and visualize the data points in each cluster
-sns.scatterplot(x="total_bill", y="tip", hue=labels, data=tips, palette="colorblind")
-plt.show()
+    # Adjust the spacing between subplots
+    fig.tight_layout()
 
-# Get the data points in each cluster
-cluster_0 = X[labels == 0]
-cluster_1 = X[labels == 1]
-cluster_2 = X[labels == 2]
-
-print("Cluster 0:")
-print(cluster_0)
-print("Cluster 1:")
-print(cluster_1)
-print("Cluster 2:")
-print(cluster_2)
+    # Display the plots
+    plt.show()
+plot_subplots(5)

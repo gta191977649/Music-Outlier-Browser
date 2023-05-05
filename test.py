@@ -1,30 +1,9 @@
-import seaborn as sns
-import matplotlib.pyplot as plt
 import numpy as np
-from sklearn.cluster import KMeans
-def plot_subplots(N):
-    # Generate some sample data
-    x = np.linspace(0, 10, 100)
-    y = np.sin(x)
 
-    # Calculate the number of rows and columns
-    nrows = N // 2
-    ncols = N // 2 + N % 2
+my_array = np.array([])  # initialize an empty numpy array
 
-    # Create a grid of subplots
-    fig, axs = plt.subplots(nrows=nrows, ncols=ncols)
 
-    # Flatten the axs array to simplify the loop
-    axs = axs.ravel()
+my_array = np.vstack((my_array, [1, 2, 3]))  # append a row of values to the array
 
-    # Loop over the subplots and plot the data
-    for i in range(N):
-        axs[i].plot(x, y)
-        axs[i].set_title(f'Plot {i+1}')
 
-    # Adjust the spacing between subplots
-    fig.tight_layout()
-
-    # Display the plots
-    plt.show()
-plot_subplots(5)
+print(my_array)  # output: [1. 2. 3.]

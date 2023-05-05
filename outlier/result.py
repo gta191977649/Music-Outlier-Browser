@@ -172,12 +172,16 @@ def generateInteractionPlotFromArtistList(artists,dx="tempo",dy="loudness"):
 """
 def generateInteractionPlotFromArtistList(artists,dx="tempo",dy="loudness"):
     data = []
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(dpi=150)
     x = []
     y = []
-    #cmap = plt.get_cmap("Paired", 10)
-    #colors =cmap(np.linspace(0, 1, 10))
-    colors = ['limegreen','blue','red','tab:purple']
+
+    colors = ['tab:green', 'red']
+    markers = {
+        'tab:green': 'v',
+        'red': 'o',
+
+    }
     group = []
     for i, artist in enumerate(artists):
         # get song info
@@ -190,11 +194,21 @@ def generateInteractionPlotFromArtistList(artists,dx="tempo",dy="loudness"):
         for j in range(0, len(info)):
             group.append(colors[i])
 
-        #sns.kdeplot(x=px,y=py,c=colors[i] ,bw_adjust=0.5, levels=2)
-        ax.scatter(x, y,c=colors[i],s=10,label=artist)
-    print(group)
-    ax.scatter(x, y, c=group,cmap="Set2", s=15, picker=True)
+    # create a numpy array of x and y values
+    x = np.array(x)
+    y = np.array(y)
+    group = np.array(group)
+
+    # loop through unique colors and plot scatter plot with corresponding marker
+    for i, (color, marker) in enumerate(markers.items()):
+        mask = group == color
+        ax.scatter(x[mask], y[mask], facecolors='none', edgecolors=color, marker=marker, s=50, label=artists[i],
+                   picker=True)
+
     plt.legend()
+    plt.savefig("all.png")
+    plt.show()
+
     def onclick(event):
         song_index = event.ind[0]
         song = data[song_index]
@@ -212,4 +226,6 @@ def generateInteractionPlotFromArtistList(artists,dx="tempo",dy="loudness"):
         root.mainloop()
 
     cid = fig.canvas.mpl_connect("pick_event", onclick)
+
     plt.show()
+

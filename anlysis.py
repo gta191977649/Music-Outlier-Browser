@@ -14,6 +14,7 @@ from tqdm import tqdm
 import seaborn as sns
 from matplotlib.colors import ListedColormap
 import mpltex
+import csv
 
 def graphLabel(clusters,dx="tempo",dy="loudness"):
     colors = ['red', 'blue', 'green', 'orange', 'purple', 'yellow', 'pink']
@@ -61,10 +62,12 @@ def graphOutlier(clusters,dx="tempo",dy="loudness"):
     plt.savefig("./chart/outliers/{}.png".format(artist))
     plt.show()
 
-def findOutliersFromClusters(artist,dx="tempo",dy="loudness"):
+def findOutliersFromClusters(artist,dx="tempo",dy="loudness",saveFigure=False):
     outlier = OutlierDetection.Outlier()
     data = dataset.getDataFromArtist(artist)
     clusters = outlier.cluster("gmm", data, n_components=2)
+    if saveFigure:
+        graphOutlier(clusters)
     labels = []
     for item in clusters["data"]:
         label = item["label"]
@@ -77,6 +80,7 @@ def findOutliersFromClusters(artist,dx="tempo",dy="loudness"):
     # draw graph with outlier
     data = []
     outliers = []
+    outliers_data = []
     for item in clusters["data"]:
         x = item[dx]
         y = item[dy]
@@ -86,10 +90,40 @@ def findOutliersFromClusters(artist,dx="tempo",dy="loudness"):
 
         if label == outlier_label:
             outliers.append([x, y])
+            outliers_data.append(item["title"])
     data = np.array(data)
     outliers = np.array(outliers)
     return outliers,data
 
+
+def findOutliersFromClustersWithSongTitle(artist,dx="tempo",dy="loudness",saveFigure=False):
+    outlier = OutlierDetection.Outlier()
+    data = dataset.getDataFromArtist(artist)
+    clusters = outlier.cluster("gmm", data, n_components=2)
+    if saveFigure:
+        graphOutlier(clusters)
+    labels = []
+    for item in clusters["data"]:
+        label = item["label"]
+        labels.append(label)
+
+    unique, counts = np.unique(labels, return_counts=True)
+    occurrences = dict(zip(unique, counts))
+    outlier_label = min(occurrences, key=lambda x: occurrences[x])
+    # draw graph with outlier
+    data = []
+    outliers = []
+    outliers_data = []
+    for item in clusters["data"]:
+        x = item[dx]
+        y = item[dy]
+        label = item["label"]
+        data.append([x, y])
+        # plt.scatter(x=x,y=y,color=colors)
+
+        if label == outlier_label:
+            outliers.append(item["title"])
+    return outliers
 @mpltex.acs_decorator
 def outlierDetectionGMM(artist,dx="tempo",dy="loudness"):
     data = dataset.getDataFromArtist(artist)
@@ -165,7 +199,6 @@ def gmm2(artist,dx="tempo",dy="loudness"):
 def drawArtists():
     mpl.rcParams['font.family'] = 'Times New Roman'
     #mpl.rcParams['font.size'] = 10
-
     fig, axs = plt.subplots(2, 2)
     outliers,data = findOutliersFromClusters("Blue Oyster Cult")
     axs[0,0].scatter(x=data[:,0],y=data[:,1],color="blue",s=10)
@@ -192,28 +225,127 @@ def drawArtists():
     axs[1, 1].legend()
 
     plt.subplots_adjust(hspace=0.5, wspace=0.5)
-    plt.savefig('myplot.png', dpi=300)
+    plt.savefig('myplot.png', dpi=700)
 
     plt.show()
 
+def findFindOutliersFromArtists(artists,generateFigure=False):
+    outliers_list = np.empty((0,2))
+    for artist in artists:
+        print("[{}]".format(artist))
+        outliers,data = findOutliersFromClusters(artist,saveFigure=generateFigure)
+        outliers_list = np.concatenate((outliers_list,outliers),axis=0)
+    outliers_list = np.array(outliers_list)
+
+    print("There are total {} outliers".format(outliers_list.shape[0]))
+    return outliers_list
+
+def doOutliersDetectionFromArtistList(artist_list,generateFigure=False):
+    print("Task: Detecting Outliers from given artist list")
+    outliers = findFindOutliersFromArtists(artist_list,generateFigure)
+    print(outliers)
+
+def read_csv_and_create_dict(input_file):
+    with open(input_file, 'r') as csvfile:
+        reader = csv.reader(csvfile)
+        next(reader)  # Skip the header row
+
+        output_dict = {}
+        current_artist = None
+
+        for row in reader:
+            if row[0]:  # If the first column (Artist) is not empty
+                current_artist = row[0]
+                output_dict[current_artist] = {}
+            else:
+                song_title = row[1].replace(u'\xa0', u' ')
+                outlier = row[2]
+                #outlier_category = row[3]
+                if outlier == "1":
+                    output_dict[current_artist][song_title] = outlier
+
+    return output_dict
+
+def evaluateModel():
+    # read outlier lavel csv
+    #csv = pd.read_csv("./anlysis/Artist Outlier.csv")
+    out = []
+    labels_ground = read_csv_and_create_dict("./anlysis/Artist Outlier.csv")
+    for a in labels_ground:
+        artist = a
+        print("Artist: {}".format(artist))
+
+        data_all = dataset.getDataFromArtist(artist)
+        data_all = list(map(lambda x: x['title'], data_all))
+        outliers = [song for song, outlier in labels_ground[artist].items() if outlier == '1']
+
+        # Create groud truth labels
+        labels = {}
+        for song in data_all:
+            if song in outliers:
+                labels[song] = 1
+            else:
+                labels[song] = 0
+        # Create predit labels
+        predicted = findOutliersFromClustersWithSongTitle(artist)
+        predicted_labels = {}
+        for song in data_all:
+            if song in predicted:
+                predicted_labels[song] = 1
+            else:
+                predicted_labels[song] = 0
+
+        # Evaluate model
+        TruePositive = len([song for song, label in labels.items() if label == 1 and predicted_labels[song] == 1])
+        TrueNegative = len([song for song, label in labels.items() if label == 0 and predicted_labels[song] == 0])
+        FalsePositive = len([song for song, label in labels.items() if label == 0 and predicted_labels[song] == 1])
+        FalseNegative = len([song for song, label in labels.items() if label == 1 and predicted_labels[song] == 0])
+
+        metrics = {}
+        metrics['Artist'] = artist
+
+        if (TruePositive + FalseNegative) != 0:
+            metrics['TPR'] = round(TruePositive / (TruePositive + FalseNegative), 3)
+        else:
+            metrics['TPR'] = "N/A"
+
+        if (FalsePositive + TrueNegative) != 0:
+            metrics['FPR'] = round(FalsePositive / (FalsePositive + TrueNegative), 3)
+        else:
+            metrics['FPR'] = "N/A"
+
+        if (TrueNegative + FalsePositive) != 0:
+            metrics['TNR'] = round(TrueNegative / (TrueNegative + FalsePositive), 3)
+        else:
+            metrics['TNR'] = "N/A"
+
+        if (FalseNegative + TruePositive) != 0:
+            metrics['FNR'] = round(FalseNegative / (FalseNegative + TruePositive), 3)
+        else:
+            metrics['FNR'] = "N/A"
+
+
+
+        print("TPR: {}, FPR: {}, TNR: {}, FNR: {}".format(metrics['TPR'], metrics['FPR'], metrics['TNR'], metrics['FNR']))
+        out.append(metrics)
+    csv = pd.DataFrame(out)
+    print(csv)
+    csv.to_csv("./anlysis/outlierdetection_result.csv",index=None)
+
 if __name__ == '__main__':
     artist_list = [
-        "Blue Oyster Cult",
-        "MNEMIC",
-        "Colin Meloy",
-        "Rod Lee",
-        "Blue Six",
-        "Chris Clark",
-        "Deadmau5"
+        "The Waybacks",
     ]
-    # Do cluster
-    outlier = OutlierDetection.Outlier()
-    data = dataset.getDataFromArtist("Colin Meloy")
-    clusters = outlier.cluster("gmm", data,n_components=2)
-    #graphLabel(clusters)
-    graphOutlier(clusters)
-
-    #outlierDetectionGMM("Colin Meloy")
-    #outlierDetectionGMM("Blue Six")
-
     #drawArtists()
+    # Do cluster
+    # outlier = OutlierDetection.Outlier()
+    # data = dataset.getDataFromArtist("Colin Meloy")
+    # clusters = outlier.cluster("gmm", data,n_components=2)
+
+    #graphLabel(clusters)
+    #graphOutlier(clusters)
+    findOutliersFromClusters("Thievery Corporation", saveFigure=True)
+    #outlierDetectionGMM("The Waybacks")
+    #outlierDetectionGMM("Blue Six")
+    #drawArtists()
+    #evaluateModel()

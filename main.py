@@ -65,7 +65,7 @@ if __name__ == '__main__':
 
     #print(artist_list)
     #result.generateAllGraph(artist_list)
-    #result.generateAllArtistGraph(artist_list)
+    #result.generateAllArtistGraph(["MNEMIC"])
     #result.generateArtistsHeatMap(['Deadmau5','Benga','Blue Six','Bug'z In The Attic'],x_discriminator="tempo",title="Dance & Electronica")
     #result.generateGenreHeatMap("hip-hop", discriminator="loudness")
     # artist_list = dataset.getAllArtistList(min=10)[:10]
@@ -74,8 +74,8 @@ if __name__ == '__main__':
 
     artist_list = [
         "Blue Oyster Cult",
-        "MNEMIC",
+        #"MNEMIC",
         "Colin Meloy",
-        "Rod Lee"
+        #"Rod Lee"
     ]
-    result.generateInteractionPlotFromArtistList(artist_list)
+    #result.generateInteractionPlotFromArtistList(artist_list)

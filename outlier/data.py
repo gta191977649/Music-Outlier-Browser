@@ -16,8 +16,8 @@ def dictfetchall(cursor):
 
 
 def executeSQL(sql, params=None):
-    path = "{}/{}".format(pathlib.Path().resolve(), CONF.DB_PATH)
-    conn = sqlite3.connect(path)
+    #path = "{}/{}".format(pathlib.Path().resolve(), CONF.DB_PATH)
+    conn = sqlite3.connect(CONF.DB_PATH)
     c = conn.cursor()
     if params:
         c.execute(sql, params)

@@ -1,16 +1,13 @@
 import matplotlib.pyplot as plt
-import numpy as np
 
-# Generate some sample data
-x = np.linspace(0, 10, 100)
-y = np.sin(x)
+# Create a figure and axes
+fig, ax = plt.subplots()
 
-# Plot the data with a colormap
-sc = plt.scatter(x, y, c=y, cmap='coolwarm')
+# Set the font name for the tick labels
+font = {'family': 'Arial', 'size': 14}
+ax.set_ticklabels(ax.get_xticklabels(), font)
+ax.set_ticklabels(ax.get_yticklabels(), font)
 
-# Add a colorbar
-cb = plt.colorbar(sc)
-cb.set_label('y')
-plt.legend()
-# Show the plot
+# Plot the data and show the plot
+ax.plot([1, 2, 3], [4, 5, 6])
 plt.show()

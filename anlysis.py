@@ -198,34 +198,31 @@ def gmm2(artist,dx="tempo",dy="loudness"):
 
 def drawArtists():
     mpl.rcParams['font.family'] = 'Times New Roman'
-    #mpl.rcParams['font.size'] = 10
-    fig, axs = plt.subplots(2, 2)
-    outliers,data = findOutliersFromClusters("Blue Oyster Cult")
-    axs[0,0].scatter(x=data[:,0],y=data[:,1],color="blue",s=10)
-    axs[0,0].scatter(x=outliers[:,0],y=outliers[:,1],marker='x',color="red",s=50,label="Outlier")
-    axs[0,0].set_title("Blue Oyster Cult (k=2)")
-    axs[0,0].legend()
+    # mpl.rcParams['font.size'] = 10
 
-    outliers,data = findOutliersFromClusters("MNEMIC")
-    axs[0,1].scatter(x=data[:,0],y=data[:,1],color="blue",s=10)
-    axs[0,1].scatter(x=outliers[:,0],y=outliers[:,1],marker='x',color="red",s=50,label="Outlier")
-    axs[0, 1].set_title("MNEMIC (k=2)")
-    axs[0, 1].legend()
+    fig, axs = plt.subplots(figsize=(3, 2))
 
-    outliers,data = findOutliersFromClusters("Colin Meloy")
-    axs[1,0].scatter(x=data[:,0],y=data[:,1],color="blue",s=10)
-    axs[1,0].scatter(x=outliers[:,0],y=outliers[:,1],marker='x',color="red",s=50,label="Outlier")
-    axs[1,0].set_title("Colin Meloy (k=2)")
-    axs[1,0].legend()
+    #First subplot
+    outliers, data = findOutliersFromClusters("Blue Oyster Cult")
+    axs.scatter(x=data[:, 0], y=data[:, 1], color="blue", s=10)
+    axs.scatter(x=outliers[:, 0], y=outliers[:, 1], marker='x', color="red", s=50, label="Outlier")
+    axs.set_title("Blue Oyster Cult")
+    #
+    #
+    axs.legend()
 
-    outliers,data = findOutliersFromClusters("Rod Lee")
-    axs[1,1].scatter(x=data[:,0],y=data[:,1],color="blue",s=10)
-    axs[1,1].scatter(x=outliers[:,0],y=outliers[:,1],marker='x',color="red",s=50,label="Outlier")
-    axs[1, 1].set_title("Rod Lee (k=2)")
-    axs[1, 1].legend()
 
-    plt.subplots_adjust(hspace=0.5, wspace=0.5)
-    plt.savefig('myplot.png', dpi=700)
+    # # Second subplot
+    # outliers, data = findOutliersFromClusters("Rod Lee")
+    # axs.scatter(x=data[:, 0], y=data[:, 1], color="blue", s=2)
+    # axs.scatter(x=outliers[:, 0], y=outliers[:, 1], marker='x', color="red", s=50, label="Outlier")
+    # axs.set_title("Rod Lee")
+    # axs.legend()
+
+    axs.set_xlim(-10, 220)
+    axs.set_ylim(-35,0)
+    # plt.subplots_adjust(wspace=0.3)
+    plt.savefig('myplot.png', dpi=500)
 
     plt.show()
 
@@ -336,7 +333,16 @@ if __name__ == '__main__':
     artist_list = [
         "The Waybacks",
     ]
-    #drawArtists()
+
+    # labels_ground = read_csv_and_create_dict("./anlysis/Artist Outlier.csv")
+    #
+    # n_songs = 0
+    # for a in labels_ground:
+    #     data = dataset.getDataFromArtist(a)
+    #     n_songs+= len(data)
+    # print(n_songs)
+
+    drawArtists()
     # Do cluster
     # outlier = OutlierDetection.Outlier()
     # data = dataset.getDataFromArtist("Colin Meloy")
@@ -344,7 +350,7 @@ if __name__ == '__main__':
 
     #graphLabel(clusters)
     #graphOutlier(clusters)
-    findOutliersFromClusters("Thievery Corporation", saveFigure=True)
+    #findOutliersFromClusters("Thievery Corporation", saveFigure=True)
     #outlierDetectionGMM("The Waybacks")
     #outlierDetectionGMM("Blue Six")
     #drawArtists()

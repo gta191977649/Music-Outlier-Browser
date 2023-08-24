@@ -3,3 +3,4 @@ frontend/build
 api/__pycache__/
 .idea/
 Outlier/__pycache__/
+/dataset/

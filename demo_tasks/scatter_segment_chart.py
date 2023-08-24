@@ -9,7 +9,7 @@ songs = [
 
 
 if __name__ == '__main__':
-    song = hdf5_getters.open_h5_file_read("../dataset/MSD/"+songs[0]+".h5")
+    song = hdf5_getters.open_h5_file_read("../data/MSD/"+songs[0]+".h5")
     #section_data = hdf5_getters.get_segments_loudness_max(song)
     section_data = hdf5_getters.get_sections_start(song)
     print(section_data)

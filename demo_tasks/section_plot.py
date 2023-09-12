@@ -45,6 +45,7 @@ def getSectionFeature(song, feature='loudness'):
         tempo = hdf5_getters.get_tempo(song)
         num_segments = len(hdf5_getters.get_sections_start(song))-1
         return np.full(num_segments, tempo)
+
 if __name__ == '__main__':
     ARTIST_NAME = "blue_oyster_cult"
     f = open("{}.txt".format(ARTIST_NAME))

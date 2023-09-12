@@ -13,7 +13,6 @@ def getSectionFeatureFromSegments(song,segment_feature):
     segment_starts = hdf5_getters.get_segments_start(song)
     # segment_loudness = hdf5_getters.get_segments_loudness_max(song)
 
-
     section_feature = []
 
     for i in range(len(section_starts) - 1):

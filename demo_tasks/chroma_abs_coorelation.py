@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 import soundfile as sf
 # Load audio file
-audio_file = '../test_main.wav'
+audio_file = '../music/nogizaka_demo.wav'
 y, sr = librosa.load(audio_file)
 
 # Beat tracking
@@ -55,7 +55,8 @@ for i in range(len(chroma_segments)):
 beat_chroma = np.array([np.mean(segment, axis=1) for segment in chroma_segments]).T
 
 # Compute the original chroma features for the entire audio signal
-original_chroma = librosa.feature.chroma_stft(y=y, sr=sr)
+#original_chroma = librosa.feature.chroma_stft(y=y, sr=sr)
+original_chroma = librosa.feature.chroma_cens(y=y, sr=sr)
 
 # Plotting
 plt.figure(figsize=(10, 10))

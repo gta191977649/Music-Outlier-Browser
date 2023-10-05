@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 import pandas as pd
 from scipy import stats
+from tslearn.metrics import dtw_path
 
 x_feature = "loudness"
 summary_method = "mean"
@@ -17,7 +18,11 @@ def section_difference(section_features):
     """
     Calculate the difference between the mean values of adjacent sections.
     """
+    differences = []
     differences = [(section_features[i+1] - section_features[i]) for i in range(len(section_features) - 1)]
+    # for i in range(len(section_features) - 1):
+    #     path,sim = dtw_path(section_features[i+1], section_features[i])
+    #     differences.append(sim)
     #return np.abs(differences)
     return differences
 

@@ -37,11 +37,15 @@ def envaluate(outliers):
     print("F1 Score:", f1)
     return f1
 
-if __name__ == '__main__':
-    result = allin1.analyze('../music/Test_AABA.wav',device="mps")
-    fig = allin1.visualize(result)
-    fig.show()
+def detectSection(path):
+    result = allin1.analyze(path, device="mps")
     print(result)
+    # fig = allin1.visualize(result)
+    # fig.show()
+
+if __name__ == '__main__':
+    detectSection('../music/nogizaka_demo.wav')
+
     # 1. Prepare data
     # ARTIST_NAME = "blue_oyster_cult"
     # songs = []

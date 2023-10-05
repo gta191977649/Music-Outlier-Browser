@@ -9,6 +9,7 @@ import groundtruth as gt
 from sklearn.metrics import f1_score
 import allin1
 
+
 def processSong(path):
     # 1.Pre-processing
     song = data.getData(path)
@@ -17,15 +18,17 @@ def processSong(path):
     # 2.Model section constrast by DTW
     contrast_matrix = []
     for i in range(0, len(section_features) - 1):
-        #plot.plotDTW(section_features[i],section_features[i+1])
+        # plot.plotDTW(section_features[i],section_features[i+1])
         path, sim = dtw_path(section_features[i], section_features[i + 1])
         contrast_matrix.append(sim)
     # 3.Aggregate Scores
     aggregated_score = np.mean(contrast_matrix)
-    return aggregated_score,contrast_matrix
+    return aggregated_score, contrast_matrix
+
+
 def envaluate(outliers):
     csv = pd.read_csv("../dataset/outlier/ground_truth.csv")
-    groundTruth = gt.getDataByArtist(csv,"Blue Oyster Cult")
+    groundTruth = gt.getDataByArtist(csv, "Blue Oyster Cult")
 
     groundTruth_binary = [1 if song['Outlier'] == 1.0 else 0 for song in groundTruth]
     predicted_binary = [1 if song['Title'] in outliers else 0 for song in groundTruth]
@@ -37,11 +40,13 @@ def envaluate(outliers):
     print("F1 Score:", f1)
     return f1
 
+
 def detectSection(path):
-    result = allin1.analyze(path, device="mps")
+    result = allin1.analyze(path, out_dir="/Users/nurupo/Desktop/dev/Music-Outlier-Browser",device="mps")
     print(result)
     # fig = allin1.visualize(result)
     # fig.show()
+
 
 if __name__ == '__main__':
     detectSection('../music/nogizaka_demo.wav')

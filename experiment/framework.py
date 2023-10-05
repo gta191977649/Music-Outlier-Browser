@@ -42,7 +42,7 @@ def envaluate(outliers):
 
 
 def detectSection(path):
-    result = allin1.analyze(path, out_dir="/Users/nurupo/Desktop/dev/Music-Outlier-Browser",device="mps")
+    result = allin1.analyze(path,out_dir="./",device="mps")
     print(result)
     # fig = allin1.visualize(result)
     # fig.show()

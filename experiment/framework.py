@@ -43,64 +43,72 @@ def envaluate(outliers):
 
 def detectSection(path):
     #result = allin1.analyze(path,out_dir="./",device="mps")
-    result = allin1.analyze(path,device="cpu")
-    return result
+    result = allin1.analyze(path,device="cuda")
+    sections = []
+    for idx,section in enumerate(result.segments):
+        sections.append({
+            "id":idx,
+            "start":section.start,
+            "end":section.end,
+            "label":section.label
+        })
+
+    return sections
 
 
 if __name__ == '__main__':
-    result = detectSection('../music/nogizaka_demo.wav')
-    print(result)
-    print(result.segments)
-    fig = allin1.visualize(result)
-    fig.show()
+    # result = detectSection('../music/title.mp3')
+    # print(result)
+    # fig = allin1.visualize(result)
+    # fig.show()
 
     # 1. Prepare data
-    # ARTIST_NAME = "blue_oyster_cult"
-    # songs = []
-    # for idx, filename in enumerate(os.listdir("../data/{}/".format(ARTIST_NAME))):
-    #     full_file_path = os.path.join("../data/{}/".format(ARTIST_NAME), filename)
-    #     if os.path.exists(full_file_path):
-    #         file = hdf5_getters.open_h5_file_read(full_file_path)
-    #         score,sections_contrasts = processSong(full_file_path)
-    #         song = {
-    #             "id": hdf5_getters.get_song_id(file),
-    #             "title": hdf5_getters.get_title(file),
-    #             "score": score,
-    #             "contrast_matrix":sections_contrasts,
-    #         }
-    #         if not np.isnan(song["score"]):
-    #             songs.append(song)
-    #
-    # # 2. Normalize DTW Scores
-    # scores = [song["score"] for song in songs]
-    #
-    # # Normalize the scores using min-max normalization
-    # min_score = min(scores)
-    # max_score = max(scores)
-    # normalized_scores = [(score - min_score) / (max_score - min_score) for score in scores]
-    #
-    # # Update the 'score' key in the songs list with the normalized scores
-    # for song, norm_score in zip(songs, normalized_scores):
-    #     song["score"] = norm_score
-    #
-    #
-    # # 3. Detect outliers
-    # Q1 = np.percentile(normalized_scores, 25)
-    # Q3 = np.percentile(normalized_scores, 75)
-    # IQR = Q3 - Q1
-    #
-    # # Define bounds for outlier detection
-    # lower_bound = Q1 - 1.5 * IQR
-    # upper_bound = Q3 + 1.5 * IQR
-    #
-    # # Generate outliers
-    # outliers = [song for song in songs if song["score"] < lower_bound or song["score"] > upper_bound]
-    #
-    # # Print out the song IDs of the outliers
-    # for outlier in outliers:
-    #     print("Outlier Song ID:", outlier)
-    #
-    # # 4. Testing Results
-    # envaluate(outliers)
-    # # Visualize the outlier songs
-    # plot.plot_histogram_and_bars(songs,outliers)
+    ARTIST_NAME = "blue_oyster_cult"
+    songs = []
+    for idx, filename in enumerate(os.listdir("../data/{}/".format(ARTIST_NAME))):
+        full_file_path = os.path.join("../data/{}/".format(ARTIST_NAME), filename)
+        if os.path.exists(full_file_path):
+            file = hdf5_getters.open_h5_file_read(full_file_path)
+            score,sections_contrasts = processSong(full_file_path)
+            song = {
+                "id": hdf5_getters.get_song_id(file),
+                "title": hdf5_getters.get_title(file),
+                "score": score,
+                "contrast_matrix":sections_contrasts,
+            }
+            if not np.isnan(song["score"]):
+                songs.append(song)
+
+    # 2. Normalize DTW Scores
+    scores = [song["score"] for song in songs]
+
+    # Normalize the scores using min-max normalization
+    min_score = min(scores)
+    max_score = max(scores)
+    normalized_scores = [(score - min_score) / (max_score - min_score) for score in scores]
+
+    # Update the 'score' key in the songs list with the normalized scores
+    for song, norm_score in zip(songs, normalized_scores):
+        song["score"] = norm_score
+
+
+    # 3. Detect outliers
+    Q1 = np.percentile(normalized_scores, 25)
+    Q3 = np.percentile(normalized_scores, 75)
+    IQR = Q3 - Q1
+
+    # Define bounds for outlier detection
+    lower_bound = Q1 - 1.5 * IQR
+    upper_bound = Q3 + 1.5 * IQR
+
+    # Generate outliers
+    outliers = [song for song in songs if song["score"] < lower_bound or song["score"] > upper_bound]
+
+    # Print out the song IDs of the outliers
+    for outlier in outliers:
+        print("Outlier Song ID:", outlier)
+
+    # 4. Testing Results
+    envaluate(outliers)
+    # Visualize the outlier songs
+    plot.plot_histogram_and_bars(songs,outliers)

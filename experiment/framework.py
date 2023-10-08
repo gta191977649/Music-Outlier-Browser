@@ -18,8 +18,8 @@ def processSong(path):
     # 2.Model section constrast by DTW
     contrast_matrix = []
     for i in range(0, len(section_features) - 1):
-        # plot.plotDTW(section_features[i],section_features[i+1])
-        path, sim = dtw_path(section_features[i], section_features[i + 1])
+        #plot.plotDTW(section_features[i],section_features[i+1])
+        path, sim = dtw_path(section_features[i]["feature"], section_features[i + 1]["feature"])
         contrast_matrix.append(sim)
     # 3.Aggregate Scores
     aggregated_score = np.mean(contrast_matrix)
@@ -37,7 +37,7 @@ def envaluate(outliers):
     f1 = f1_score(groundTruth_binary, predicted_binary)
 
     print("--------------")
-    print("F1 Score:", f1)
+    print("F1 Score:", f1, "{}".format(f1 < 50 and "☹️" or "🎉"))
     return f1
 
 
@@ -55,6 +55,10 @@ def detectSection(path):
 
     return sections
 
+def seconds_to_mm_ss(seconds):
+    minutes = int(seconds // 60)
+    seconds = int(seconds % 60)
+    return "{:02d}:{:02d}".format(minutes, seconds)
 
 if __name__ == '__main__':
     # result = detectSection('../music/title.mp3')
@@ -63,18 +67,28 @@ if __name__ == '__main__':
     # fig.show()
 
     # 1. Prepare data
-    ARTIST_NAME = "blue_oyster_cult"
+    ARTIST_NAME = "deadmu5"
     songs = []
     for idx, filename in enumerate(os.listdir("../data/{}/".format(ARTIST_NAME))):
         full_file_path = os.path.join("../data/{}/".format(ARTIST_NAME), filename)
         if os.path.exists(full_file_path):
             file = hdf5_getters.open_h5_file_read(full_file_path)
+            section_features = data.getSectionFeature(file, feature="loudness")
             score,sections_contrasts = processSong(full_file_path)
+
+            contrasts = np.array(sections_contrasts)
+            if contrasts.size == 0:
+                max_section = None  # or set a default value
+            else:
+                max_section = np.argmax(contrasts)
+
             song = {
+                "file":file,
                 "id": hdf5_getters.get_song_id(file),
                 "title": hdf5_getters.get_title(file),
                 "score": score,
                 "contrast_matrix":sections_contrasts,
+                "max_section":max_section
             }
             if not np.isnan(song["score"]):
                 songs.append(song)
@@ -106,9 +120,21 @@ if __name__ == '__main__':
 
     # Print out the song IDs of the outliers
     for outlier in outliers:
-        print("Outlier Song ID:", outlier)
+        print(outlier["id"],outlier["title"],outlier["score"],outlier["contrast_matrix"])
+    # Print Average Score for dist
+    print("Mean Score: ",np.mean(normalized_scores))
 
     # 4. Testing Results
     envaluate(outliers)
+
+    # 5. Print out most section pairs that has max contrast in time frame
+    for outlier in outliers:
+        file = outlier["file"]
+        max_contribute_section_index = outlier["max_section"],
+        index = max_contribute_section_index[0]
+        # get most contribute
+        section_features = data.getSectionFeature(file, feature="loudness")
+        print("Name: {}, start: {}, end: {}".format(outlier["title"],seconds_to_mm_ss(section_features[index]["time"][0]),seconds_to_mm_ss(section_features[index]["time"][1])))
+
     # Visualize the outlier songs
     plot.plot_histogram_and_bars(songs,outliers)

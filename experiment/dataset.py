@@ -37,7 +37,10 @@ def getSectionFeatureFromSegments(song,segment_feature):
         # Identify segments within this section
         segments_in_section = np.array([feature for start, feature in zip(segment_starts, segment_feature) if start_time <= start < end_time])
 
-        section_feature.append(segments_in_section)
+        section_feature.append({
+            "time":[start_time,end_time],
+            "feature":segments_in_section,
+        })
     return section_feature
 def getSectionFeature(song, feature='loudness'):
     global NORMALIZED  # Use the global flag

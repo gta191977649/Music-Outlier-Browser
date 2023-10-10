@@ -20,3 +20,4 @@ if __name__ == '__main__':
     song.plot(showLegend=False)
     start_1, end_1, start_2, end_2 = song.getHighestContrastSectionTime()
     print("Highest Contrast Section: [{}-{}] to [{}-{}]".format(start_1, end_1, start_2, end_2))
+    song.plotSectionDTW()

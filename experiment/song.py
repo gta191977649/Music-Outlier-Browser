@@ -1,4 +1,6 @@
 # Song Related Functions
+import time
+
 from vendor.hdf5 import hdf5_getters
 import dataset as data
 from tslearn.metrics import dtw_path
@@ -6,6 +8,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.transforms as mtransforms
 from matplotlib.ticker import FuncFormatter
+from scipy.spatial.distance import cdist
 
 def seconds_to_mm_ss(seconds):
     minutes = int(seconds // 60)
@@ -22,6 +25,74 @@ class Song:
         self.section_features = data.getSectionFeature(self.file, feature=self.inspect_feature)
         self.score, self.sections_contrasts = self.modelContrast(path)
         self.max_section = np.argmax(self.sections_contrasts)
+
+    def plotSectionDTW(self):
+        # 1.Pre-processing
+        song = self.file
+        section_features = data.getSectionFeature(song, feature=self.inspect_feature)
+
+        # 2.Model section constrast by DTW
+        contrast_matrix = []
+        for i in range(0, len(section_features) - 1):
+            # Reshape the signals
+            signal_1 = section_features[i]["feature"].reshape(-1, 1)
+            signal_2 = section_features[i + 1]["feature"].reshape(-1, 1)
+
+            # Calculate the DTW path
+            path, sim = dtw_path(signal_1, signal_2)
+
+            # Extract the path coordinates
+            path_1 = [i[0] for i in path]
+            path_2 = [i[1] for i in path]
+
+            # Calculate the similarity matrix
+            similarity_matrix = cdist(signal_1, signal_2)
+
+            # Create the figure and subplots
+            plt.figure(1, figsize=(8, 8))
+            plt.suptitle("DTW Section {} vs {} Score: {:.2f}".format(i,i+1,sim))  # Add this line for the title
+
+            left, bottom = 0.01, 0.1
+            w_ts = h_ts = 0.2
+            left_h = left + w_ts + 0.02
+            width = height = 0.65
+            bottom_h = bottom + height + 0.02
+
+            rect_s_y = [left, bottom, w_ts, height]
+            rect_gram = [left_h, bottom, width, height]
+            rect_s_x = [left_h, bottom_h, width, h_ts]
+
+            ax_gram = plt.axes(rect_gram)
+            ax_s_x = plt.axes(rect_s_x)
+            ax_s_y = plt.axes(rect_s_y)
+
+            # Plot the similarity matrix and the DTW path
+            ax_gram.imshow(similarity_matrix, cmap='gray_r', origin='lower')
+            ax_gram.plot(path_2, path_1, 'r-', linewidth=3.)
+            ax_gram.set_xlim([0, len(signal_2) - 1])  # Set x-axis limit to match the length of signal_2
+            ax_gram.set_ylim([0, len(signal_1) - 1])  # Set y-axis limit to match the length of signal_1
+
+            # Plot the reference signal
+            ax_s_x.plot(signal_2, 'b-', linewidth=1.)
+            ax_s_x.set_xlim([0, len(signal_2) - 1])
+            ax_s_x.set_xlabel('Time')
+            ax_s_x.set_ylabel('Amplitude')
+            ax_s_x.spines['top'].set_visible(False)
+            ax_s_x.spines['right'].set_visible(False)
+
+            # Plot the dependent signal
+            ax_s_y.plot(-signal_2, np.arange(len(signal_2)), 'b-', linewidth=1.)
+            ax_s_y.set_ylim([0, len(signal_2) - 1])
+            ax_s_y.set_xlabel('Amplitude')
+            ax_s_y.set_ylabel('Time')
+            ax_s_y.spines['top'].set_visible(False)
+            ax_s_y.spines['right'].set_visible(False)
+
+
+            plt.tight_layout()
+            plt.show()
+            time.sleep(1)
+
     def modelContrast(self,path):
         # 1.Pre-processing
         song = data.getData(path)

@@ -50,7 +50,7 @@ class Song:
 
             # Create the figure and subplots
             plt.figure(1, figsize=(8, 8))
-            plt.suptitle("DTW Section {} vs {} Score: {:.2f}".format(i,i+1,sim))  # Add this line for the title
+            plt.suptitle("DTW Section {} vs {} Score: {:.1f}".format(i,i+1,sim))  # Add this line for the title
 
             left, bottom = 0.01, 0.1
             w_ts = h_ts = 0.2

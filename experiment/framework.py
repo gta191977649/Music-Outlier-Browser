@@ -28,7 +28,7 @@ def processSong(path):
 
 def envaluate(outliers):
     csv = pd.read_csv("../dataset/outlier/ground_truth.csv")
-    groundTruth = gt.getDataByArtist(csv, "Blue Oyster Cult")
+    groundTruth = gt.getDataByArtist(csv, "Colin Meloy")
 
     groundTruth_binary = [1 if song['Outlier'] == 1.0 else 0 for song in groundTruth]
     predicted_binary = [1 if song['Title'] in outliers else 0 for song in groundTruth]
@@ -68,7 +68,7 @@ if __name__ == '__main__':
     # fig.show()
 
     # 1. Prepare data
-    ARTIST_NAME = "deadmu5"
+    ARTIST_NAME = "colin_meloy"
     songs = []
     for idx, filename in enumerate(os.listdir("../data/{}/".format(ARTIST_NAME))):
         full_file_path = os.path.join("../data/{}/".format(ARTIST_NAME), filename)

@@ -20,8 +20,8 @@ class Song:
         self.inspect_feature = feature
         self.file = hdf5_getters.open_h5_file_read(path)
         self.id = hdf5_getters.get_song_id(self.file)
-        self.title = hdf5_getters.get_title(self.file)
-        self.artist = hdf5_getters.get_artist_name(self.file)
+        self.title = hdf5_getters.get_title(self.file).decode('utf-8')
+        self.artist = hdf5_getters.get_artist_name(self.file).decode('utf-8')
         self.section_features = data.getSectionFeature(self.file, feature=self.inspect_feature)
         self.score, self.sections_contrasts = self.modelContrast(path)
         self.max_section = np.argmax(self.sections_contrasts)
@@ -131,7 +131,7 @@ class Song:
             axs[0].plot(times, section["feature"], color=colors[idx],
                         label=f"Section: {start_time_str} to {end_time_str}", alpha=0.8)
 
-        axs[0].set_title('{}\n{} over Time'.format(self.title, self.inspect_feature))
+        axs[0].set_title('{} - {}\n{} over Time'.format(self.title,self.artist, self.inspect_feature))
         axs[0].set_xlabel('Time (mm:ss)')
         axs[0].set_ylabel(self.inspect_feature)
         axs[0].grid(True)

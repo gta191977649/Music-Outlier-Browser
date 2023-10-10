@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 import numpy as np
 import seaborn as sns
+import matplotlib
+#matplotlib.rcParams['font.family'] = 'TakaoPGothic'
 
 def plotDTW(signal_1, signal_2):
     # Reshape the signals
@@ -145,4 +147,29 @@ def plot_histogram_and_bars(songs, outliers):
     ax[1].set_ylabel('Contrast Score')
 
     plt.tight_layout()
+    plt.show()
+
+def plot_signals(signals, labels=None,title=None):
+    """
+    Plot multiple signals on the same plot.
+
+    Parameters:
+    signals (list of np.array): List of signals to plot.
+    labels (list of str, optional): List of labels for each signal. Defaults to None.
+    """
+    # Create a color cycle iterator using the default property cycle
+    color_cycle = plt.cm.viridis(np.linspace(0, 1, len(signals)))
+
+    plt.figure(figsize=(10, 6))
+    for idx, signal in enumerate(signals):
+        color = color_cycle[idx]
+        label = labels[idx] if labels else f'Signal {idx+1}'
+        #plt.plot(signal, label=label, color=color)
+        plt.plot(signal, label=label)
+
+    plt.xlabel('Time (frames)')
+    plt.ylabel('Amplitude (dB)')
+    plt.legend(loc='upper right')
+    plt.title('Filter Bank Test\n{}'.format(title))
+    plt.grid(True)
     plt.show()

@@ -6,7 +6,7 @@ import numpy as np
 import seaborn as sns
 import matplotlib
 #matplotlib.rcParams['font.family'] = 'TakaoPGothic'
-
+import librosa
 def plotDTW(signal_1, signal_2):
     # Reshape the signals
     signal_1 = signal_1.reshape(-1, 1)
@@ -172,4 +172,51 @@ def plot_signals(signals, labels=None,title=None):
     plt.legend(loc='upper right')
     plt.title('Filter Bank Test\n{}'.format(title))
     plt.grid(True)
+    plt.show()
+
+def seconds_to_mmss(seconds):
+    minutes = int(seconds // 60)
+    seconds %= 60
+    return f"{minutes:02d}:{seconds:02.0f}"
+def plot_signals_by_sections(sections,title=None):
+    # Create two subplots with different heights using gridspec_kw
+    fig, axs = plt.subplots(2, 1, figsize=(7, 5), sharex=True, gridspec_kw={'height_ratios': [3, 0.2]})
+
+    colors = plt.cm.tab20(np.linspace(0, 1, len(sections)))  # Generates a color map
+
+    for idx, section in enumerate(sections):
+        start_time, end_time = section['time']
+        feature = section['feature']
+
+        # Create an array representing the time in seconds for this section
+        time_array = np.linspace(start_time, end_time, len(feature))
+
+        # Plotting each section with a different color in the first subplot
+        axs[0].plot(time_array, feature, label=f'Section {section["label"]}', color=colors[idx])
+
+        # Drawing vertical bars to indicate sections in the second subplot
+        axs[1].axvspan(start_time, end_time, color=colors[idx], alpha=0.5)
+        # Adding section label text in the center of each rectangle
+        center_time = (start_time + end_time) / 2
+        axs[1].text(center_time, 0.5, section["label"], ha='center', va='center')
+
+        # Adding vertical grey dashed lines to indicate section boundaries in the top signal plot
+        axs[0].axvline(x=start_time, color='grey', linestyle='--', linewidth=1,alpha=0.5)
+        axs[0].axvline(x=end_time, color='grey', linestyle='--', linewidth=1,alpha=0.5)
+
+    axs[0].set_ylabel('Feature Value')
+    axs[0].set_title('{}\nSection Structure Analysis'.format(title))
+    # axs[0].legend(loc='lower left')
+    axs[0].grid(False)
+
+    axs[1].set_xlabel('Time (mm:ss)')
+    axs[1].set_yticks([])  # Hide y-axis ticks and labels for the second subplot
+    axs[1].set_xlim([0, np.max([section['time'][1] for section in sections])])  # Set x-axis limits
+
+    # Format x-axis labels as mm:ss
+    axs[1].set_xticks(
+        np.arange(0, np.max([section['time'][1] for section in sections]) + 1, step=60))  # Set x-ticks every 60 seconds
+    axs[1].set_xticklabels([seconds_to_mmss(t) for t in axs[1].get_xticks()])
+
+    plt.tight_layout()  # Adjust layout to prevent clipping
     plt.show()

@@ -3,6 +3,7 @@ import librosa
 import numpy as np
 from gammatone import fftweight
 from scipy import interpolate
+import allin1
 
 
 def dspFilterBank(filterBank, y, sr):
@@ -72,3 +73,14 @@ def extractFeature(y, sr, type="rms", filterBank="mel"):
     if type == "rms":
         rms = librosa.feature.rms(y=y)
         return rms
+
+def extractSection(path):
+    result = allin1.analyze(path,device="cuda")
+    sections = []
+    for idx,section in enumerate(result.segments):
+        sections.append({
+            "id":idx,
+            "time":[section.start,section.end],
+            "label":section.label
+        })
+    return sections

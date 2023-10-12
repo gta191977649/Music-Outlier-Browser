@@ -1,0 +1,16 @@
+
+
+# 1. get all the contrast values from all songs with in artist
+
+# 2. do a clustering based on these contrast values (start with the simple methods e.g. normal distrubution +IQR)
+
+# 3. Extract the outliers songs beyoud the threshold
+
+# 4. Evaluate these outliers songs against with the GT using an error metric.
+
+
+
+
+
+
+

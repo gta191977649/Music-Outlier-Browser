@@ -1,0 +1,42 @@
+# Get ground truth dataset from file
+# Reformat dataset
+
+
+
+
+# Extract features from MSD for songs in dataset
+
+# Subset features to get the useful ones 
+
+# Maybe get the contrast values?
+
+
+
+
+
+# Stick features into fancy algorithm and look for outliers
+
+
+# Choose outliers
+
+
+# Get a training set for the ML
+
+# Train a model against the 
+
+
+
+
+# Use second algorithm to classify outliers based on fancy stuff
+
+
+# Compare to training set
+# 
+
+
+
+
+
+
+
+

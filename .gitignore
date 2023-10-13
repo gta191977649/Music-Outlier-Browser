@@ -4,3 +4,6 @@ api/__pycache__/
 .idea/
 Outlier/__pycache__/
 songle_outlier/__pycache__/
+experiment/demix/
+*.DS_Store
+experiment/__pycache__/

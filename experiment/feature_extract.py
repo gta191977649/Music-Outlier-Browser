@@ -74,8 +74,8 @@ def extractFeature(y, sr, type="rms", filterBank="mel"):
         rms = librosa.feature.rms(y=y)
         return rms
 
-def extractSection(path):
-    result = allin1.analyze(path,device="cuda")
+def extractSection(path,device="cuda"):
+    result = allin1.analyze(path,device=device)
     sections = []
     for idx,section in enumerate(result.segments):
         sections.append({

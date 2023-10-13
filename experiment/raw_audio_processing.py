@@ -28,7 +28,7 @@ if __name__ == '__main__':
     # 2. extract features
     loudness_mel = featureExtractor.extractFeature(y, sr, type="loudness",filterBank="mel")
     loudness_gamma = featureExtractor.extractFeature(y, sr, type="loudness",filterBank="gamma")
-    section = featureExtractor.extractSection(path)
+    section = featureExtractor.extractSection(path,device="cpu")
     section = embeddingSectonFeature(sr,section,loudness_gamma)
 
     plot.plot_signals([loudness_mel, loudness_gamma], labels=["Mel Filter Bank", "Gammatone Filter Bank"],

@@ -1,5 +1,8 @@
 # Song Related Functions
+import os.path
 import time
+
+import librosa
 
 from vendor.hdf5 import hdf5_getters
 import dataset as data
@@ -9,7 +12,7 @@ import matplotlib.pyplot as plt
 import matplotlib.transforms as mtransforms
 from matplotlib.ticker import FuncFormatter
 from scipy.spatial.distance import cdist
-
+import feature_extract as featureExtractor
 def seconds_to_mm_ss(seconds):
     minutes = int(seconds // 60)
     seconds = int(seconds % 60)
@@ -17,14 +20,27 @@ def seconds_to_mm_ss(seconds):
 
 class Song:
     def __init__(self,path,feature="loudness"):
+        extension = os.path.splitext(path)[1]
         self.inspect_feature = feature
-        self.file = hdf5_getters.open_h5_file_read(path)
-        self.id = hdf5_getters.get_song_id(self.file)
-        self.title = hdf5_getters.get_title(self.file).decode('utf-8')
-        self.artist = hdf5_getters.get_artist_name(self.file).decode('utf-8')
-        self.section_features = data.getSectionFeature(self.file, feature=self.inspect_feature)
-        self.score, self.sections_contrasts = self.modelContrast(path)
-        self.max_section = np.argmax(self.sections_contrasts)
+        if extension == ".h5":
+            self.file = hdf5_getters.open_h5_file_read(path)
+            self.id = hdf5_getters.get_song_id(self.file)
+            self.title = hdf5_getters.get_title(self.file).decode('utf-8')
+            self.artist = hdf5_getters.get_artist_name(self.file).decode('utf-8')
+            self.section_features = data.getSectionFeature(self.file, feature=self.inspect_feature)
+            self.score, self.sections_contrasts = self.modelContrast(self.section_features)
+            self.max_section = np.argmax(self.sections_contrasts)
+        else: # if is raw audio file, we manully extracts the features
+            self.file = path
+            self.y,self.sr = librosa.load(path)
+            self.id = "NA"
+            self.title = path
+            self.artist = "N/A"
+            sections = featureExtractor.extractSection(self.file)
+            features = featureExtractor.extractFeature(self.y, self.sr, type=self.inspect_feature, filterBank="gamma")
+            self.section_features = featureExtractor.dspEmbeddingSectonFeature(self.sr,sections,features)
+            self.score, self.sections_contrasts = self.modelContrast(self.section_features)
+            self.max_section = np.argmax(self.sections_contrasts)
 
     def plotSectionDTW(self):
         # 1.Pre-processing
@@ -93,17 +109,13 @@ class Song:
             plt.show()
             time.sleep(1)
 
-    def modelContrast(self,path):
-        # 1.Pre-processing
-        song = data.getData(path)
-        section_features = data.getSectionFeature(song, feature=self.inspect_feature)
-
-        # 2.Model section constrast by DTW
+    def modelContrast(self,section_features):
+        # 1.Model section constrast by DTW
         contrast_matrix = []
         for i in range(0, len(section_features) - 1):
             path, sim = dtw_path(section_features[i]["feature"], section_features[i + 1]["feature"])
             contrast_matrix.append(sim)
-        # 3.Aggregate Scores
+        # 2.Aggregate Scores
         aggregated_score = np.mean(contrast_matrix)
         return aggregated_score, contrast_matrix
 

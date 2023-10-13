@@ -14,7 +14,8 @@ def plotAllContrastPlotForAritst(artistname):
         time.sleep(1)
 
 if __name__ == '__main__':
-    song = Song("../data/colin_meloy/TRQYFYM128F4272098.h5", feature="loudness")
+    #song = Song("../data/colin_meloy/TRQYFYM128F4272098.h5", feature="loudness")
+    song = Song("../music/bokunanka.wav", feature="loudness")
     song.plot(showLegend=False)
     start_1, end_1, start_2, end_2 = song.getHighestContrastSectionTime()
     print("Highest Contrast Section: [{}-{}] to [{}-{}]".format(start_1, end_1, start_2, end_2))

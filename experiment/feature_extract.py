@@ -40,7 +40,16 @@ def dspFilterBank(filterBank, y, sr):
         """
         return gammatone_spectrogram
 
-
+def dspEmbeddingSectonFeature(sr,sections, feature):
+    hop_length = 512
+    for section in sections:
+        start_time, end_time = section["time"]
+        # Convert time to frames
+        start_frame = librosa.time_to_frames(start_time, sr=sr, hop_length=hop_length)
+        end_frame = librosa.time_to_frames(end_time, sr=sr, hop_length=hop_length)
+        # Extract the features for this section
+        section["feature"] = feature[start_frame:end_frame]
+    return sections
 def extractFeature(y, sr, type="rms", filterBank="mel"):
     """
     y: signal in time-domain
@@ -74,7 +83,7 @@ def extractFeature(y, sr, type="rms", filterBank="mel"):
         rms = librosa.feature.rms(y=y)
         return rms
 
-def extractSection(path,device="cuda"):
+def extractSection(path,device="cpu"):
     result = allin1.analyze(path,device=device)
     sections = []
     for idx,section in enumerate(result.segments):

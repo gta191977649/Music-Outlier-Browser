@@ -23,7 +23,7 @@ def embeddingSectonFeature(sr,sections, feature):
 
 if __name__ == '__main__':
     # 1. load file
-    path = "../music/bokunanka.mp3"
+    path = "../music/aozoragahigauutawari.mp3"
     y, sr = loadFile(path)
     # 2. extract features
     loudness_mel = featureExtractor.extractFeature(y, sr, type="loudness",filterBank="mel")
@@ -31,6 +31,8 @@ if __name__ == '__main__':
     section = featureExtractor.extractSection(path)
     section = embeddingSectonFeature(sr,section,loudness_gamma)
 
+    plot.plot_signals([loudness_mel, loudness_gamma], labels=["Mel Filter Bank", "Gammatone Filter Bank"],
+                      title="Saiyounaranoimi - Nogizaka 48")
     plot.plot_signals_by_sections(section,title=path)
 
     # Filter Bank Test

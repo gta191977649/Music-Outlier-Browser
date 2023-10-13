@@ -172,6 +172,7 @@ def plot_signals(signals, labels=None,title=None):
     plt.legend(loc='upper right')
     plt.title('Filter Bank Test\n{}'.format(title))
     plt.grid(True)
+    plt.xlim(0, max([len(signal) for signal in signals]))
     plt.show()
 
 def seconds_to_mmss(seconds):

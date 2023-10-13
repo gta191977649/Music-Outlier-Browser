@@ -45,7 +45,7 @@ class Song:
     def plotSectionDTW(self):
         # 1.Pre-processing
         song = self.file
-        section_features = data.getSectionFeature(song, feature=self.inspect_feature)
+        section_features = self.section_features
 
         # 2.Model section constrast by DTW
         contrast_matrix = []

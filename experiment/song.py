@@ -19,7 +19,7 @@ def seconds_to_mm_ss(seconds):
     return "{:02d}:{:02d}".format(minutes, seconds)
 
 class Song:
-    def __init__(self,path,feature="loudness"):
+    def __init__(self,path,feature="loudness",filterBank="mel"):
         extension = os.path.splitext(path)[1]
         self.inspect_feature = feature
         if extension == ".h5":
@@ -37,7 +37,7 @@ class Song:
             self.title = path
             self.artist = "N/A"
             sections = featureExtractor.extractSection(self.file)
-            features = featureExtractor.extractFeature(self.y, self.sr, type=self.inspect_feature, filterBank="gamma")
+            features = featureExtractor.extractFeature(self.y, self.sr, type=self.inspect_feature, filterBank=filterBank)
             self.section_features = featureExtractor.dspEmbeddingSectonFeature(self.sr,sections,features)
             self.score, self.sections_contrasts = self.modelContrast(self.section_features)
             self.max_section = np.argmax(self.sections_contrasts)

@@ -2,7 +2,10 @@
 # it's not the testing framework to envaluate the model performance.
 import time
 from song import Song
+from player import Player
 import os.path
+import plot as plot
+
 def plotAllContrastPlotForAritst(artistname):
     ARTIST_NAME = artistname
     for idx, filename in enumerate(os.listdir("../data/{}/".format(ARTIST_NAME))):
@@ -14,9 +17,13 @@ def plotAllContrastPlotForAritst(artistname):
         time.sleep(1)
 
 if __name__ == '__main__':
+    path = "../music/start over.mp3"
     #song = Song("../data/colin_meloy/TRQYFYM128F4272098.h5", feature="loudness")
-    song = Song("../music/bokunanka.wav", feature="loudness")
-    song.plot(showLegend=False)
+    song = Song(path, feature="loudness",filterBank="gamma")
+    #plot.plot_signals_by_sections(song.section_features, title=path)
+    player = Player(song)
+    player.show()
+    # song.plot(showLegend=False)
     start_1, end_1, start_2, end_2 = song.getHighestContrastSectionTime()
     print("Highest Contrast Section: [{}-{}] to [{}-{}]".format(start_1, end_1, start_2, end_2))
-    song.plotSectionDTW()
+    #song.plotSectionDTW()

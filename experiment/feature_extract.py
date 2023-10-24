@@ -57,7 +57,7 @@ def dspEmbeddingSectonFeature(sr, sections, feature):
     return sections
 
 
-def extractFeature(y, sr, type="rms", filterBank="mel", normalize=False):
+def extractFeature(y, sr, type="loudness", filterBank="mel", normalize=False):
     """
     y: signal in time-domain
     sr: sample rate of source audio file
@@ -96,6 +96,11 @@ def extractFeature(y, sr, type="rms", filterBank="mel", normalize=False):
             spectrogram = np.sqrt(spectrogram)
         output_feature = librosa.feature.spectral_centroid(S=spectrogram.T, n_fft=n_fft, hop_length=hop_length)[0]
 
+    if type == "zcr":
+        # Compute zero crossing rate
+        zcr = librosa.feature.zero_crossing_rate(y, frame_length=n_fft, hop_length=hop_length)[0]
+        # since zcr compute on time domain, there no need for interpolating by the frame level
+        return zcr
     # Last Standardize the frame length by interpolating the features array
     if len(output_feature) != desired_num_frames:
         x_old = np.linspace(0, 1, len(output_feature))

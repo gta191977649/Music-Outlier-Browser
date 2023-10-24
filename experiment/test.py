@@ -18,7 +18,7 @@ def plotAllContrastPlotForAritst(artistname):
 
 if __name__ == '__main__':
     path = "../Test_AABA.wav"
-    song = Song(path, feature="sc",filterBank="gamma")
+    song = Song(path, feature="rms",filterBank="gamma")
     plot.plot_signals_by_sections(song.section_features, title=path)
     player = Player(song)
     player.show()

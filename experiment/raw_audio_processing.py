@@ -3,8 +3,8 @@
 import librosa
 import feature_extract as featureExtractor
 import plot as plot
-def loadFile(path):
-    y,sr = librosa.load(path)
+def loadFile(path,mono=True):
+    y,sr = librosa.load(path,mono=mono)
     print("File:{}\nSample Rate:{}".format(path,sr))
     return y, sr
 
@@ -22,18 +22,23 @@ def embeddingSectonFeature(sr,sections, feature):
 
 
 if __name__ == '__main__':
+    # target feature
+    TARGET_FEATURE = "rms"
     # 1. load file
     path = "../music/aozoragahigauutawari.mp3"
     y, sr = loadFile(path)
     # 2. extract features
-    loudness_mel = featureExtractor.extractFeature(y, sr, type="loudness",filterBank="mel")
-    loudness_gamma = featureExtractor.extractFeature(y, sr, type="loudness",filterBank="gamma")
-    section = featureExtractor.extractSection(path)
-    section = embeddingSectonFeature(sr,section,loudness_gamma)
+    loudness_mel = featureExtractor.extractFeature(y, sr, type=TARGET_FEATURE,filterBank="mel",normalize=True)
+    loudness_gamma = featureExtractor.extractFeature(y, sr, type=TARGET_FEATURE,filterBank="gamma",normalize=True)
+    print("[DEBUG] Feature Vector Shape:")
+    print("melFilter: {}\ngammatoneFilter: {}".format(loudness_mel.shape,loudness_gamma.shape))
 
     plot.plot_signals([loudness_mel, loudness_gamma], labels=["Mel Filter Bank", "Gammatone Filter Bank"],
                       title="Saiyounaranoimi - Nogizaka 48")
-    plot.plot_signals_by_sections(section,title=path)
+    # 3. section segementation
+    # section = featureExtractor.extractSection(path)
+    # section = embeddingSectonFeature(sr,section,loudness_gamma)
+    #plot.plot_signals_by_sections(section,title=path)
 
     # Filter Bank Test
     # y, sr = loadFile("../music/サヨナラの意味.wav")

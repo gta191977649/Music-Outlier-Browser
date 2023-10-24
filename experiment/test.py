@@ -17,13 +17,12 @@ def plotAllContrastPlotForAritst(artistname):
         time.sleep(1)
 
 if __name__ == '__main__':
-    path = "../music/start over.mp3"
-    #song = Song("../data/colin_meloy/TRQYFYM128F4272098.h5", feature="loudness")
-    song = Song(path, feature="loudness",filterBank="gamma")
-    #plot.plot_signals_by_sections(song.section_features, title=path)
+    path = "../Test_AABA.wav"
+    song = Song(path, feature="sc",filterBank="gamma")
+    plot.plot_signals_by_sections(song.section_features, title=path)
     player = Player(song)
     player.show()
-    # song.plot(showLegend=False)
-    start_1, end_1, start_2, end_2 = song.getHighestContrastSectionTime()
-    print("Highest Contrast Section: [{}-{}] to [{}-{}]".format(start_1, end_1, start_2, end_2))
-    #song.plotSectionDTW()
+    # # song.plot(showLegend=False)
+    # start_1, end_1, start_2, end_2 = song.getHighestContrastSectionTime()
+    # print("Highest Contrast Section: [{}-{}] to [{}-{}]".format(start_1, end_1, start_2, end_2))
+    # #song.plotSectionDTW()

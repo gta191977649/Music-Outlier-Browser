@@ -6,6 +6,7 @@ from gammatone import fftweight
 from scipy import interpolate
 import allin1
 from config import CONF
+import matplotlib.pyplot as plt
 
 
 def dspFilterBank(filterBank, y, sr):
@@ -24,6 +25,7 @@ def dspFilterBank(filterBank, y, sr):
                                                      channels=128, f_min=0)
         """
         Compute Gammatone spectrogram using fft_gtgram function 
+        NOTE: It returns spectrogram in MAGNITUDE!!!! 
         Parameters:
         y:  Audio signal, should be a 1-D numpy array.
         sr: Sampling rate of the audio signal.
@@ -42,7 +44,8 @@ def dspFilterBank(filterBank, y, sr):
         """
         return gammatone_spectrogram
 
-def dspEmbeddingSectonFeature(sr,sections, feature):
+
+def dspEmbeddingSectonFeature(sr, sections, feature):
     hop_length = 512
     for section in sections:
         start_time, end_time = section["time"]
@@ -52,46 +55,66 @@ def dspEmbeddingSectonFeature(sr,sections, feature):
         # Extract the features for this section
         section["feature"] = feature[start_frame:end_frame]
     return sections
-def extractFeature(y, sr, type="rms", filterBank="mel"):
+
+
+def extractFeature(y, sr, type="rms", filterBank="mel", normalize=False):
     """
     y: signal in time-domain
     sr: sample rate of source audio file
     """
+    output_feature = []
     n_fft = 2048
     hop_length = 512
     # Calculate the desired number of frames based on the audio length and hop_length
     desired_num_frames = 1 + (len(y) - n_fft) // hop_length
+    # 1. deal with whatever filter banks want to use
+    # Note dspFilterBank returned the spectrogram in powered
+    spectrogram = dspFilterBank(filterBank=filterBank, y=y, sr=sr)
 
     if type == "loudness":
-        # deal with whatever filter banks want to use
-        spectrogram = dspFilterBank(filterBank=filterBank, y=y, sr=sr)
         # Compute loudness
         loudness = np.sum(spectrogram, axis=0)
         if filterBank == "gamma":
             loudness = loudness ** 2
-        loudness_db = librosa.power_to_db(loudness)
+        output_feature = librosa.power_to_db(loudness)
         # Adjust the loudness values to a negative dB scale
-        loudness_db -= np.max(loudness_db)  # Subtract the maximum loudness value from all loudness values
+        # Subtract the maximum loudness value from all loudness values
+        output_feature -= np.max(output_feature)
 
-        # Standardize the frame length by interpolating the loudness array
-        if len(loudness_db) != desired_num_frames:
-            x_old = np.linspace(0, 1, len(loudness_db))
-            x_new = np.linspace(0, 1, desired_num_frames)
-            interpolator = interpolate.interp1d(x_old, loudness_db, kind='linear', fill_value='extrapolate')
-            loudness_db = interpolator(x_new)
-
-        return loudness_db
     if type == "rms":
-        rms = librosa.feature.rms(y=y)
-        return rms
+        # converts power spectrogram to magnitude if using mel-filterbank
+        # the gammatone filter don't need to anything as it already represent in magnitude squared.
+        if filterBank == "mel":
+            spectrogram = np.sqrt(spectrogram)  # Convert to magnitude spectrogram if necessary
+            # Manually compute RMS for each frame
+        output_feature = np.sqrt(np.mean(spectrogram ** 2, axis=0))
+
+    if type == "sc":  # Spectral Centroid
+        # converts power spectrogram to magnitude if using mel-filterbank
+        # the gammatone filter don't need to anything as it already represent in magnitude squared.
+        if filterBank == "mel":
+            spectrogram = np.sqrt(spectrogram)
+        output_feature = librosa.feature.spectral_centroid(S=spectrogram.T, n_fft=n_fft, hop_length=hop_length)[0]
+
+    # Last Standardize the frame length by interpolating the features array
+    if len(output_feature) != desired_num_frames:
+        x_old = np.linspace(0, 1, len(output_feature))
+        x_new = np.linspace(0, 1, desired_num_frames)
+        interpolator = interpolate.interp1d(x_old, output_feature, kind='linear', fill_value='extrapolate')
+        output_feature = interpolator(x_new)
+
+    if normalize:
+        output_feature = (output_feature - np.min(output_feature)) / (np.max(output_feature) - np.min(output_feature))
+    return output_feature
+
 
 def extractSection(path):
-    result = allin1.analyze(path,device=CONF["device"])
+    result = allin1.analyze(path, device=CONF["device"])
     sections = []
-    for idx,section in enumerate(result.segments):
+    for idx, section in enumerate(result.segments):
         sections.append({
-            "id":idx,
-            "time":[section.start,section.end],
-            "label":section.label
+            "id": idx,
+            "time": [section.start, section.end],
+            "label": section.label
         })
     return sections

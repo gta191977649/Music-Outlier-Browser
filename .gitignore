@@ -7,3 +7,5 @@ songle_outlier/__pycache__/
 experiment/demix/
 *.DS_Store
 experiment/__pycache__/
+*.pyc
+*.pyc

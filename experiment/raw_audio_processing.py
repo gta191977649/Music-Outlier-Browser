@@ -33,8 +33,7 @@ if __name__ == '__main__':
     print("[DEBUG] Feature Vector Shape:")
     print("melFilter: {}\ngammatoneFilter: {}".format(loudness_mel.shape,loudness_gamma.shape))
 
-    plot.plot_signals([loudness_mel, loudness_gamma], labels=["Mel Filter Bank", "Gammatone Filter Bank"],
-                      title="Saiyounaranoimi - Nogizaka 48")
+    #plot.plot_signals([loudness_mel, loudness_gamma], labels=["Mel Filter Bank", "Gammatone Filter Bank"],title="Saiyounaranoimi - Nogizaka 48")
     # 3. section segementation
     # section = featureExtractor.extractSection(path)
     # section = embeddingSectonFeature(sr,section,loudness_gamma)

@@ -12,8 +12,6 @@ class SafeFuncAnimation(animation.FuncAnimation):
             self._fig.canvas.mpl_disconnect(self._resize_id)
         except AttributeError:
             pass
-
-
 class Player:
     def __init__(self, song):
         self.song = song
@@ -38,11 +36,12 @@ class Player:
     def update_player_indicator(self, frame):
         current_time = (pygame.mixer.music.get_pos() / 1000.0) + self.clicked_time
         print(current_time)
-        if self.line and self.line_1:
-            self.line.remove()
-            self.line_1.remove()
-        self.line = self.axs[0].axvline(current_time, color='blue', linestyle='-', alpha=0.8)
-        self.line_1 = self.axs[1].axvline(current_time, color='blue', linestyle='-', alpha=0.8)
+        if self.line is None:
+            self.line = self.axs[0].axvline(current_time, color='blue', linestyle='-', alpha=0.8)
+            self.line_1 = self.axs[1].axvline(current_time, color='blue', linestyle='-', alpha=0.8)
+        else:
+            self.line.set_xdata(current_time)
+            self.line_1.set_xdata(current_time)
         return self.line, self.line_1
 
     def play_audio(self, start_time):
@@ -56,18 +55,27 @@ class Player:
             for idx, section in enumerate(self.section_features):
                 if section["time"][0] <= time_clicked <= section["time"][1]:
                     self.play_audio(section["time"][0])
-                    if self.line and self.line_1:
-                        self.line.remove()
-                        self.line_1.remove()
-                    self.line = self.axs[0].axvline(section["time"][0], color='blue', linestyle='-', alpha=0.8)
-                    self.line_1 = self.axs[1].axvline(section["time"][0], color='blue', linestyle='-', alpha=0.8)
+                    if self.line is None:
+                        self.line = self.axs[0].axvline(section["time"][0], color='blue', linestyle='-', alpha=0.8)
+                        self.line_1 = self.axs[1].axvline(section["time"][0], color='blue', linestyle='-', alpha=0.8)
+                    else:
+                        self.line.set_xdata(section["time"][0])
+                        self.line_1.set_xdata(section["time"][0])
                     self.clicked_time = section["time"][0]
                     plt.draw()
                     break
 
     def show(self):
         fig, axs = plt.subplots(2, 1, figsize=(8, 7), gridspec_kw={'height_ratios': [3, 1]})
-        colors = plt.cm.Set1(np.linspace(0, 1, len(self.section_features)))
+
+        # Get unique labels and assign a color to each
+        unique_labels = list(set(section["label"] for section in self.section_features))
+
+        if len(unique_labels) > 20:
+            print("Warning: There are more than 20 unique labels, colors may repeat.")
+
+        colors = plt.cm.tab20(np.linspace(0, 1, 20))
+        color_mapping = {label: colors[idx % 20] for idx, label in enumerate(unique_labels)}
 
         # Top plot
         for idx, section in enumerate(self.section_features):
@@ -76,8 +84,12 @@ class Player:
             times = np.linspace(section["time"][0], section["time"][1], len(section["feature"]))
             start_time_str = self.format_func(section["time"][0], None)
             end_time_str = self.format_func(section["time"][1], None)
-            axs[0].plot(times, section["feature"], color=colors[idx],
-                        label=f"Section: {start_time_str} to {end_time_str}", alpha=0.8)
+
+            # Use the color mapping based on the section's label
+            color = color_mapping[section["label"]]
+
+            axs[0].plot(times, section["feature"], color=color,
+                        label=f"Section: {start_time_str} to {end_time_str} ({section['label']})", alpha=0.8)
 
         axs[0].set_title('{} - {}\n{} over Time'.format(self.title, self.artist, self.inspect_feature))
         axs[0].set_xlabel('Time (mm:ss)')

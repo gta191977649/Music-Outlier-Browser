@@ -18,7 +18,8 @@ def plotAllContrastPlotForAritst(artistname):
 
 if __name__ == '__main__':
     path = "../music/AKB48_kiminomelody.mp3"
-    song = Song(path, feature="rms",filterBank="mel")
+    #path = "../data/blue_oyster_cult/TRASNUX128F425EAF2.h5"
+    song = Song(path, feature="loudness",filterBank="mel")
     print(song.section_features)
 
     #plot.plot_signals_by_sections(song.section_features, title=path)

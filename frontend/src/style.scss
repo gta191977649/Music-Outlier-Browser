@@ -1,3 +1,34 @@
 
 //$primary: #f39800;
 @import "~bootstrap/scss/bootstrap";
+
+
+@font-face {
+    font-family: 'JR';
+    src: local("JR"), url(./font/JNR-SB-Font.ttf) format('truetype');
+}
+
+body {
+    margin: 0px;
+    padding:0px;
+    font-family: "JR";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+$DARK: #343a40;
+.card {
+    border-radius: 0px;
+    border-width: 2px;
+    border-color: $DARK;
+    box-shadow: 5px 5px 0px -1px$DARK;
+
+}
+.card-header {
+    font-size: 20px;
+    background-color: transparent;
+    border-color: $DARK;
+    border-width: 2px;
+    padding: 5px;
+
+}

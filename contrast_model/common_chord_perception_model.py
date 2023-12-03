@@ -22,6 +22,13 @@ intervals_within_sixth = list(range(1, 10))  # From one semitone above the root 
 # A4 frequency for standard pitch
 REFERENCE_FREQUENCY = 440
 
+# Function to convert note names to frequencies
+def note_to_frequency(note_name, reference_freq=440.0):
+    # Distance of note from A in the chromatic scale
+    semitone_distance_from_A = notes_semitones[note_name]
+    # A4 is the 9th semitone from C in an octave, so we adjust by subtracting 9
+    semitone_distance_from_A4 = semitone_distance_from_A - 9
+    return reference_freq * (2 ** (semitone_distance_from_A4 / 12))
 
 def note_from_root(root, semitones):
     root_position = notes_semitones[root]
@@ -39,11 +46,27 @@ def cartesian_to_polar(x, y):
     r = np.sqrt(x ** 2 + y ** 2)
     theta = np.arctan2(y, x)
     return r, np.degrees(theta)
-
-def compute_chord_vectors(chord_notes):
+def compute_chord_dissonance(chord_freqs, n_partials=10, model='sethares1993'):
+    # Calculate the harmonic tones and their amplitudes for the given chord frequencies
+    h_freqs, h_amps = harmonic_tone(chord_freqs, n_partials=n_partials)
+    # Calculate the dissonance of the harmonic tones
+    dissonance_value = dissonance(h_freqs, h_amps, model=model)
+    return dissonance_value
+def compute_chord_vectors(chord_notes, reference_freq=440.0, n_partials=10, model='sethares1993'):
+    # Convert note names to frequencies
+    freqs = [note_to_frequency(note, reference_freq) for note in chord_notes]
+    # Calculate the dissonance of the chord
+    dissonance_value = compute_chord_dissonance(freqs, n_partials=n_partials, model=model)
+    # Convert dissonance value to a vector magnitude
+    magnitude = 1 / (1 + dissonance_value)
+    #magnitude = dissonance_value
+    # Compute chord vectors using the magnitude
     chord_angles_rad = [np.deg2rad(notes_degrees[note]) for note in chord_notes]
-    chord_vectors = np.array([np.cos(chord_angles_rad), np.sin(chord_angles_rad)])
-    return np.sum(chord_vectors, axis=1)
+    chord_vectors = np.array([np.cos(chord_angles_rad) * magnitude, np.sin(chord_angles_rad) * magnitude])
+    # Sum the vectors to get the resultant vector for the chord
+    sum_vector = np.sum(chord_vectors, axis=1)
+    return sum_vector
+
 
 def plot_model(chord_notes, sum_vector, ax):
 

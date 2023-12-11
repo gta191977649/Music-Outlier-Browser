@@ -5,10 +5,18 @@ from django.views.generic import View
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.db import connection
-
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.parsers import MultiPartParser, FormParser
+from .models import MidiFile
+from .serializers import MidiFileSerializer
 import outlier.outlier
 from outlier.outlier import Outlier
+from contrast_model.Contrast import *
 import numpy as np
+import music21
+
+
 def dictfetchall(cursor):
     "Return all rows from a cursor as a dict"
     columns = [col[0] for col in cursor.description]
@@ -83,3 +91,23 @@ def search(request):
     #     "1":1,
     # }
     # return JsonResponse(data)
+
+
+class MidiFileUploadView(APIView):
+    parser_classes = [MultiPartParser, FormParser]
+
+    @csrf_exempt
+    def post(self, request, *args, **kwargs):
+        midi_serializer = MidiFileSerializer(data=request.data)
+        if midi_serializer.is_valid():
+            midi_serializer.save()
+            midi_file = midi_serializer.instance.file.path
+            chords = self.analyze_midi(midi_file)
+            return Response({'chords': chords}, status=200)
+        else:
+            return Response(midi_serializer.errors, status=400)
+
+    def analyze_midi(self, file_path):
+        # anlysis
+        model = Contrast(file_path)
+        return model.anlysis()

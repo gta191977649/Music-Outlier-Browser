@@ -1,3 +1,4 @@
 from django.db import models
 
-# Create your models here.
+class MidiFile(models.Model):
+    file = models.FileField(upload_to='midis/')

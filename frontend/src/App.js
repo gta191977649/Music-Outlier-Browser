@@ -17,10 +17,10 @@ export default function App() {
             <header>
                 <p className='logo'>♪ Music Browser</p>
                 <ul className='header-nav'>
-                    <li><Link to="/" className="nav-link px-2 link-dark">Home</Link></li>
-                    <li><Link to="/spotify" className="nav-link px-2 link-dark">Spotify API</Link></li>
-                    <li><Link to="/about" className="nav-link px-2 link-dark">About</Link></li>
-                    <li><Link to="/anlysis" className="nav-link px-2 link-dark">Anlysis</Link></li>
+                    <li><Link to="/" className="nav-link px-2">Home</Link></li>
+                    <li><Link to="/spotify" className="nav-link px-2">Spotify API</Link></li>
+                    <li><Link to="/about" className="nav-link px-2">About</Link></li>
+                    <li><Link to="/anlysis" className="nav-link px-2">Anlysis</Link></li>
                 </ul>
             </header>
             <Routes>

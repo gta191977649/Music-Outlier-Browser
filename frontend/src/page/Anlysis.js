@@ -1,42 +1,243 @@
-import React, {useState} from 'react';
+import React, { useState,useRef,useEffect } from 'react';
+import axios from 'axios';
+import {
+    Chart as ChartJS,
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Title,
+    Tooltip,
+    Legend,
+  } from 'chart.js';
+import { Line,Bar } from 'react-chartjs-2';
+  
+import annotationPlugin from 'chartjs-plugin-annotation';
+
+// Registering components and plugin for Chart.js
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  annotationPlugin
+);
 
 export default function Analysis() {
-    const [file, setFile] = useState("");
-    return (
-        <div className='container mt-5'>
-            <h2>Contrast Analysis</h2>
+    const [file, setFile] = useState(null);
+    const [waveFile, setWaveFile] = useState(null);
+    const [analysisResponse, setAnalysisResponse] = useState(null);
+    const [wait,setWait] = useState(false);
+    const [currentPosition, setCurrentPosition] = useState(0); 
+    const [audio, setAudio] = useState(null);
+    const [audioTime, setAudioTime] = useState(0);
+
+    const handlePlay = () => {
+        if (audio) {
+            audio.play();
+        }
+    };
+
+    const handlePause = () => {
+        if (audio) {
+            audio.pause();
+        }
+    };
+
+    const handleReset = () => {
+        if (audio) {
+            audio.currentTime = 0;
+        }
+    };
+
+    const handleTimeUpdate = () => {
+        
+        const currentTime = audio.currentTime;
+        setAudioTime(currentTime);
+
+        const chordTimings = analysisResponse.chord_timing_ls;
+        for (let i = 0; i < chordTimings.length; i++) {
+            const [startTime, , endTime] = chordTimings[i];
+            if (currentTime >= startTime && currentTime <= endTime) {
+                setCurrentPosition(i); // Set the position to the index of the current chord
+                break; // Exit the loop once the correct index is found
+            }
+        }
+     
+    };
+    // Handle file selection
+    const handleFileSelect = (event) => {
+        const selectedFile = event.target.files[0];
+        if (selectedFile) {
+            setFile(selectedFile);
+            console.log(selectedFile.name); // For debugging
+        }
+    };
+    const handleWaveFileSelect = (event) => {
+        const selectedFile = event.target.files[0];
+        if (selectedFile) {
+            setWaveFile(selectedFile);
+            const audioUrl = URL.createObjectURL(selectedFile);
+            setAudio(new Audio(audioUrl));
+        }
+    };
+
+    useEffect(() => {
+        if (audio) {
+            audio.addEventListener('timeupdate', handleTimeUpdate);
+
+            // Clean up
+            return () => {
+                audio.removeEventListener('timeupdate', handleTimeUpdate);
+            };
+        }
+    }, [audio,analysisResponse]);
+
+    // Handle file upload
+    const handleFileUpload = async () => {
+        if (file) {
+            const formData = new FormData();
+            formData.append('file', file);
+            setWait(true);
+            try {
+                const response = await axios.post('http://localhost:8000/api/midi-upload/', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                });
+                setAnalysisResponse(response.data.chords);
+                setWait(false);
+            } catch (error) {
+                console.error('Error uploading file:', error);
+                setWait(false);
+            }
+        }
+    };
+
+    const renderPlot = (title,values_data,color) => {
+        const data = {
+            labels: values_data.map((_, index) => `${index + 1}`),
+         
+            datasets: [
+                {
+                    label: title,
+                    data: values_data,
+                    fill: false,
+                    backgroundColor: color,
+                    borderColor: color,
+                    borderWidth: 1.5,
+                    pointRadius: 2,
+                    tension: 0.1,
+                },
+            ],
+        };
+
+        const options = {
+            maintainAspectRatio: true,
             
-            <div class="card">
-                <div class="card-body">
-                    <input 
-                        type="file" 
-                        id="fileInput" 
-                        style={{ display: 'none' }} 
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            },
+            plugins: {
+                annotation: {
+                    annotations: {
+                        line1: {
+                            type: 'line',
+                            xMin: currentPosition,
+                            xMax: currentPosition,
+                            borderColor: '#e72222',
+                            borderWidth: 2,
+                        }
+                    }
+                }
+            }
+        };
+
+        return (
+            <div>
+                <Line data={data} options={options} height={50} />
+            </div>
+        );
+    }
+    const renderResponse = () => {
+        return (
+            <>
+            {renderPlot("Tension Change",analysisResponse.tension_change,"#E72222")}
+            {renderPlot("Color Change",analysisResponse.color_change,"#00965F")}
+
+            </>
+    
+
+        )
+    };
+
+    return (
+      
+        <div className='container mt-5'>
+            <h2>Contrast Analysis { wait ? <span class="spinner-border" role="status"></span> :""}</h2>
+
+            <div className="card">
+                <div className="card-body">
+                    <input
+                        type="file"
+                        id="fileInput"
+                        style={{ display: 'none' }}
                         onChange={handleFileSelect}
+                        accept=".mid"  // Specify accepted file extension
                     />
-                    <label 
-                        htmlFor="fileInput" 
-                        style={{textAlign:'center', color:"#e72222", fontWeight:"bold", cursor: "pointer"}}
+                    <label
+                        htmlFor="fileInput"
+                        style={{ textAlign: 'center', color: "#e72222", fontWeight: "bold", cursor: "pointer" }}
                     >
-                        [ DROP FILE ]
+                        {file ? `[ ${file.name} ]` : "[ DROP MIDI FILE ]"}
                     </label>
+                    <input
+                        type="file"
+                        id="fileInput2"
+                        style={{ display: 'none' }}
+                        onChange={handleWaveFileSelect}
+                        accept=".wav,.mp3" 
+                    />
+                    <label
+                        htmlFor="fileInput2"
+                        style={{ textAlign: 'center', color: "#343a40", fontWeight: "bold", cursor: "pointer" }}
+                    >
+                        {waveFile ? `[ ${waveFile.name} ]` : "[ DROP REFERENCE FILE ]"}
+                    </label>
+                    <p>
+                        <small>MIDIファイルとオーディオファイルのタイミングが一致しているかご確認お願いします。<br/>時間が異なる曲には対応しておりませんので、ご了承ください。</small>
+                    </p>
+                    <button className='btn btn-custom' onClick={handleFileUpload} style={{ display: 'block', margin: '10px auto', padding: '10px 20px' }}>
+                        Upload and Analyze
+                    </button>
                 </div>
             </div>
-
-            <div class="card mt-4">
+            {/* Audio controls */}
+            <div className="card mt-4">
                 <div className="card-header">
-                    分析応答
+                    PLAYER [TIME:{audioTime},BAR:{currentPosition}]
                 </div>
-                <div class="card-body">
-                    [ N/A ]
+                <div className="btn-group" role="group" aria-label="Basic example">
+                    <button type="button" className="btn btn-nurupo" onClick={handlePlay}>PLAY</button>
+                    <button type="button" className="btn btn-nurupo" onClick={handlePause}>PAUSE</button>
+                    <button type="button" className="btn btn-nurupo" onClick={handleReset}>RESET</button>
+                </div>
+
+            </div>
+
+            <div className="card mt-4">
+                <div className="card-header">
+                    分析
+                </div>
+                <div className="card-body">
+                    {analysisResponse !== null ? renderResponse() : '[ N/A ]'}
                 </div>
             </div>
         </div>
     );
-
-    function handleFileSelect(event) {
-        // Handle file selection
-        const file = event.target.files[0];
-        console.log(file.name); // Process the file as needed
-    }
 }

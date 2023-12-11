@@ -72,5 +72,4 @@ class Contrast:
             'freshness_ls': freshness_ls,
             'chord_timing_ls':chord_timing_ls,
         })
-        print(chord_timing_ls)
         return df

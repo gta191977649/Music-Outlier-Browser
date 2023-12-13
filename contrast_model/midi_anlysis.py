@@ -23,7 +23,7 @@ def map_music21(chord_21):
     return Chord(temp)
 
 # read midi file
-midi = music21.converter.parse(r'title.mid')
+midi = music21.converter.parse(r'../media/midis/bic_camera.mid')
 chords = midi.chordify().flat.getElementsByClass(music21.chord.Chord)
 chord_name_ls = []
 chord_tension_ls = []

@@ -25,7 +25,7 @@ ChartJS.register(
   Legend,
   annotationPlugin
 );
-
+ChartJS.defaults.font.family = 'JR'; 
 export default function Analysis() {
     const [file, setFile] = useState(null);
     const [waveFile, setWaveFile] = useState(null);
@@ -136,8 +136,8 @@ export default function Analysis() {
         };
 
         const options = {
-            maintainAspectRatio: true,
-            
+            maintainAspectRatio: false,
+            responsive: true,
             scales: {
                 y: {
                     beginAtZero: true
@@ -154,13 +154,22 @@ export default function Analysis() {
                             borderWidth: 2,
                         }
                     }
+                },
+                legend: {
+                    labels: {
+                        // This more specific font property overrides the global property
+                        font: {
+                            family:"JR",
+                            size: 14
+                        }
+                    }
                 }
             }
         };
 
         return (
             <div>
-                <Line data={data} options={options} height={50} />
+                <Line data={data} options={options} height={200} />
             </div>
         );
     }

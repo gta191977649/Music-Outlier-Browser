@@ -19,8 +19,8 @@ export default function App() {
                 <ul className='header-nav'>
                     <li><Link to="/" className="nav-link px-2">Home</Link></li>
                     <li><Link to="/spotify" className="nav-link px-2">Spotify API</Link></li>
-                    <li><Link to="/about" className="nav-link px-2">About</Link></li>
                     <li><Link to="/anlysis" className="nav-link px-2">Anlysis</Link></li>
+                    <li><Link to="/about" className="nav-link px-2">About</Link></li>
                 </ul>
             </header>
             <Routes>
@@ -29,7 +29,10 @@ export default function App() {
                 <Route path='/spotify' element={<Spotify/>}/>
                 <Route path='/anlysis' element={<Anlysis/>}/>
             </Routes>
+            <footer>Music Browser</footer>
+
         </BrowserRouter>
+
     </div>
   )
 }

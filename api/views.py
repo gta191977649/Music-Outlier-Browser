@@ -2,6 +2,7 @@ import json
 
 from django.shortcuts import render
 from django.views.generic import View
+from .utils import calculate_file_hash
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.db import connection
@@ -96,17 +97,24 @@ def search(request):
 class MidiFileUploadView(APIView):
     parser_classes = [MultiPartParser, FormParser]
 
-    @csrf_exempt
     def post(self, request, *args, **kwargs):
         midi_serializer = MidiFileSerializer(data=request.data)
         if midi_serializer.is_valid():
-            midi_serializer.save()
-            midi_file = midi_serializer.instance.file.path
-            chords = self.analyze_midi(midi_file)
+            uploaded_file = request.FILES.get('file')
+            file_hash = calculate_file_hash(uploaded_file)
+
+            existing_file = MidiFile.objects.filter(file_hash=file_hash).first()
+            if existing_file:
+                print("File already exists, use existing file for analysis")
+                chords = self.analyze_midi(existing_file.file.path)
+            else:
+                # Save new file and analyze
+                midi_file = midi_serializer.save(file_hash=file_hash)
+                chords = self.analyze_midi(midi_file.file.path)
+
             return Response({'chords': chords}, status=200)
         else:
             return Response(midi_serializer.errors, status=400)
-
     def analyze_midi(self, file_path):
         # anlysis
         model = Contrast(file_path)

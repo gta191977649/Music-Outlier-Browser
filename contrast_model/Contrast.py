@@ -31,7 +31,8 @@ class Contrast:
     def anlysis(self):
         file = self.file
         midi = music21.converter.parse(file)
-        chords = midi.chordify().flat.getElementsByClass(music21.chord.Chord)
+        #chords = midi.chordify().flat.getElementsByClass(music21.chord.Chord)
+        chords = midi.chordify().flatten().getElementsByClass(music21.chord.Chord)
         default_tempo = 120
         tempo = midi.metronomeMarkBoundaries()[0][2].number if midi.metronomeMarkBoundaries() else default_tempo
         print(tempo)

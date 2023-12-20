@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import music21
 from Chord import *
 import pandas as pd
-
+import os
 def map_music21(chord_21):
     map_21 = {'A': eNote.A,
               'D': eNote.D,
@@ -23,13 +23,15 @@ def map_music21(chord_21):
     return Chord(temp)
 
 # read midi file
-midi = music21.converter.parse(r'../media/midis/bic_camera.mid')
+FILENAME = r'../music/love_songs/days.mid'
+midi = music21.converter.parse(FILENAME)
 chords = midi.chordify().flat.getElementsByClass(music21.chord.Chord)
 chord_name_ls = []
 chord_tension_ls = []
 color_chord_ls = []
 for chord in chords:
-    chord_name_ls.append(chord.pitchedCommonName)
+    #chord_name_ls.append(chord.pitchedCommonName)
+    chord_name_ls.append(map_music21(chord).note_names)
     color_chord_ls.append(map_music21(chord))
     chord_tension_ls.append(map_music21(chord).get_harmony())
 
@@ -54,27 +56,35 @@ df = pd.DataFrame({
     'tension_change': tension_change_ls,
     'freshness': freshness_ls})
 
+df.to_csv("./contrast.csv")
 x_values = range(len(df))
 
-plt.figure(figsize=(9,7))
+plt.figure(figsize=(9,10))
 
-plt.subplot(3, 1, 1)
+plt.subplot(4, 1, 1)
 plt.plot(x_values, df['color_change'], marker='o', color='b')
 plt.title('Color Change')
 plt.ylabel('Color Change')
 
 # Tension Change
-plt.subplot(3, 1, 2)
+plt.subplot(4, 1, 2)
 plt.plot(x_values, df['tension_change'], marker='o', color='r')
 plt.title('Tension Change')
 plt.ylabel('Tension Change')
 
 # Freshness
-plt.subplot(3, 1, 3)
+plt.subplot(4, 1, 3)
 plt.plot(x_values, df['freshness'], marker='o', color='g')
 plt.title('Freshness')
 plt.ylabel('Freshness')
-plt.xlabel('Chord Name')
+# Tension
+plt.subplot(4, 1, 4)
+plt.plot(x_values, df['chord_tension'], marker='o', color='y')
+plt.title('chord_tension')
+plt.ylabel('chord_tension')
+#plt.xticks(x_values, df['chord_name'], rotation='vertical', fontsize=8)
 
+plt.suptitle(os.path.basename(FILENAME), fontsize=16)
 plt.tight_layout()
+
 plt.show()

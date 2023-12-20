@@ -95,6 +95,8 @@ class Chord:
             cNote_list.append(eNote.get_note_by_name(i))
         return Chord(cNote_list, name)
 
+    def getNotes(self):
+        return self.note_names
     def __repr__(self):
         return f"Chord {self.name} ({', '.join([note.name for note in self.notes])})"
 

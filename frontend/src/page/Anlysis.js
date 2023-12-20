@@ -1,4 +1,6 @@
 import React, { useState,useRef,useEffect } from 'react';
+import {Collapse} from 'react-collapse';
+
 import axios from 'axios';
 import {
     Chart as ChartJS,
@@ -32,8 +34,10 @@ export default function Analysis() {
     const [analysisResponse, setAnalysisResponse] = useState(null);
     const [wait,setWait] = useState(false);
     const [currentPosition, setCurrentPosition] = useState(0); 
+    const [currentChord, setCurrentChord] = useState("N/A"); 
     const [audio, setAudio] = useState(null);
     const [audioTime, setAudioTime] = useState(0);
+    const [chordMapView, setChordMapView] = useState(false);
 
     const handlePlay = () => {
         if (audio) {
@@ -63,6 +67,7 @@ export default function Analysis() {
             const [startTime, , endTime] = chordTimings[i];
             if (currentTime >= startTime && currentTime <= endTime) {
                 setCurrentPosition(i); // Set the position to the index of the current chord
+                setCurrentChord(analysisResponse.chord_name[i])
                 break; // Exit the loop once the correct index is found
             }
         }
@@ -178,7 +183,7 @@ export default function Analysis() {
             <>
             {renderPlot("Tension Change",analysisResponse.tension_change,"#E72222")}
             {renderPlot("Color Change",analysisResponse.color_change,"#00965F")}
-
+            {renderPlot("Freshness",analysisResponse.freshness_ls,"#1A43BF")}
             </>
     
 
@@ -229,7 +234,7 @@ export default function Analysis() {
             {/* Audio controls */}
             <div className="card mt-4">
                 <div className="card-header">
-                    PLAYER [TIME:{audioTime},BAR:{currentPosition}]
+                    PLAYER [TIME:{audioTime},BAR:{currentPosition},CHORD: {currentChord}]
                 </div>
                 <div className="btn-group" role="group" aria-label="Basic example">
                     <button type="button" className="btn btn-nurupo" onClick={handlePlay}>PLAY</button>
@@ -246,6 +251,32 @@ export default function Analysis() {
                 <div className="card-body">
                     {analysisResponse !== null ? renderResponse() : '[ N/A ]'}
                 </div>
+            </div>
+            <div className="card mt-4">
+                <div className="card-header" onClick={()=>{setChordMapView(!chordMapView)}}>
+                    CHORD MAP {!chordMapView ? <small>[CLICK EXPLAND ▼]</small> : ""}
+                </div>
+                <Collapse isOpened={chordMapView}>
+                <div class="d-flex flex-wrap">
+                    {analysisResponse !== null ? analysisResponse.chord_name.map((chord,i)=>{
+                        if (i == currentPosition) {
+                            return(
+                                <div key={i} class="p-2 bd-highlight flex-chord" style={{color:"#e72222",background:"#ffdddd",fontWeight:"bold"}}>
+                                    {chord}
+                                </div>
+                            )
+                        } else {
+                            return(
+                                <div key={i} class="p-2 bd-highlight flex-chord" >
+                                    {chord}
+                                </div>
+                            )
+                        }
+                        
+                    }): "[ N/A ]"}
+                  
+                </div>
+                </Collapse>
             </div>
         </div>
     );

@@ -77,11 +77,13 @@ class Chord:
 
         notes = set(notes)  # 去除重复音符
         self.note_names = [i.name for i in notes]
+
         self.notes = []  # self.notes 存储音符_Note类实例的列表
         for i in notes:
             self.notes.append(Note(i))
         self.notes.sort()
         self.keyboard_order = keyboard_order(notes)
+        self.get_theta()
 
     '''
     直接用音符名str获取和弦对象["C","E","G"]
@@ -122,12 +124,12 @@ class Chord:
         max_interval = max(intervals)
         for i in range(len(intervals)):
             if (intervals[i] == max_interval):
-
                 n_begin = self.notes[(i + 1) % len(self.notes)]
                 theta = 0
                 for n in self.notes:
                     theta += 30 * (n_begin - n)
-                thetas.append((theta / len(self.notes) + n_begin.angle) % 360)
+                    result = (theta / len(self.notes) + n_begin.angle) % 360
+                thetas.append(result)
         if len(thetas) == 1:
             self.temp_theta = thetas[0]
         return thetas

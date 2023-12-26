@@ -39,6 +39,7 @@ class Note:
         if not 1 <= self.note.value <= 12:
             raise ValueError("note index must be between 1 and 12")
         self.index = self.note.value
+
     @property
     def angle(self):
         return self.index * 30 - 15
@@ -52,7 +53,9 @@ class Note:
         return eNote(eNote.get_note_by_name(name))
 
     def __repr__(self):
-        return "_Note--'{}'".format(self.name)
+        return "{}".format(self.name.replace(
+            "sharp","#"
+        ))
 
     def angle_to(self, other):
         return (self - other) * 30

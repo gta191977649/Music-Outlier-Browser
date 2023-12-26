@@ -39,32 +39,36 @@ def convert(o):
     raise TypeError
 @csrf_exempt
 def cluster(request):
-    print(request.body)
-    # Build query from request filter
-    req = json.loads(request.body)
-    SQL = "SELECT * from `song_v2` WHERE "
-    for idx, query in enumerate(req["query"]):
-        if idx > 0:
-            SQL = SQL + " AND "
-        value = query["value"]
-        if query["criteria"] == "contain":
-            value = "%" + value + "%"
-        SQL = SQL + "`{}` {} '{}'".format(query["feature"], getCriteriaSign(query["criteria"]), value)
-    SQL = SQL + " LIMIT {}".format(req["limit"])
+    try:
+        req = json.loads(request.body)
 
+        # Build WHERE clause using list comprehension
+        where_clauses = [
+            "`{}` {} %s".format(query["feature"], getCriteriaSign(query["criteria"]))
+            for query in req["query"]
+        ]
+        where_statement = " AND ".join(where_clauses)
 
-    with connection.cursor() as cursor:
-        cursor.execute(SQL)
-        row = dictfetchall(cursor)
+        # Parameters for the query
+        params = [
+            "%{}%".format(query["value"]) if query["criteria"] == "contain" else query["value"]
+            for query in req["query"]
+        ]
+
+        SQL = "SELECT * FROM `song_v2` WHERE {} LIMIT %s".format(where_statement)
+
+        with connection.cursor() as cursor:
+            cursor.execute(SQL, params + [req["limit"]])
+            row = dictfetchall(cursor)
 
         out = Outlier()
-
-        res=out.cluster(method="mean_shift",data=row)
-        #res = json.dumps(res,default=convert)
+        res = out.cluster(method="mean_shift", data=row)
 
         return JsonResponse(res, safe=False)
 
-    return JsonResponse("Error", safe=False)
+    except Exception as e:
+        # Handle exceptions
+        return JsonResponse({"error": str(e)}, safe=False, status=500)
 
 @csrf_exempt
 def search(request):

@@ -6,6 +6,7 @@ import CdfChart from '../widget/CdfChart';
 import ClusterChart from '../widget/ClusterChart';
 import axios from 'axios'
 import * as math from '../utils/math' 
+import { getCookie } from '../utils/cookie';
 
 function App() {
 
@@ -159,8 +160,9 @@ function App() {
 
 
   const searchSong = () => {
-    const URL = "./api/search/"
-    //const URL = "http://localhost:8000/api/search/"
+    //const URL = "./api/search/"
+    const csrftoken = getCookie('csrftoken')
+    const URL = "http://localhost:8000/api/search/"
     axios.post(URL,{
       "query":query,
       "limit":limit,
@@ -181,8 +183,8 @@ function App() {
   }
   const doCluster = () => {
     setClusterData([])
-    //const URL = "http://localhost:8000/api/cluster/"
-    const URL = "./api/cluster/"
+    const URL = "http://localhost:8000/api/cluster/"
+    //const URL = "./api/cluster/"
     axios.post(URL,{
       "query":query,
       "limit":limit,

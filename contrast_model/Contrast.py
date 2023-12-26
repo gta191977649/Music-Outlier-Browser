@@ -40,9 +40,11 @@ class Contrast:
         chord_tension_ls = []
         color_chord_ls = []
         chord_timing_ls = []
+        chord_theta_ls = []
 
         for chord in chords:
             chord_name_ls.append(chord.pitchedCommonName)
+            chord_theta_ls.append(self.map_music21(chord).get_theta()[0])
             mapped_chord = self.map_music21(chord)
             color_chord_ls.append(mapped_chord)
             chord_tension_ls.append(mapped_chord.get_harmony())
@@ -67,6 +69,7 @@ class Contrast:
 
         df = pd.DataFrame({
             'chord_name': chord_name_ls,
+            'chord_theta': chord_theta_ls,
             'chord_tension': chord_tension_ls,
             'color_change': color_change_ls,
             'tension_change': tension_change_ls,

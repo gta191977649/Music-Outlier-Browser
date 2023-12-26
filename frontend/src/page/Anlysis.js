@@ -2,6 +2,8 @@ import React, { useState,useRef,useEffect } from 'react';
 import {Collapse} from 'react-collapse';
 
 import axios from 'axios';
+import { getCookie } from '../utils/cookie';
+
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -105,12 +107,16 @@ export default function Analysis() {
     const handleFileUpload = async () => {
         if (file) {
             const formData = new FormData();
+            const csrftoken = getCookie('csrftoken')
             formData.append('file', file);
             setWait(true);
             try {
-                const response = await axios.post('http://localhost:8000/api/midi-upload/', formData, {
+                //const URL = "./api/midi-upload/"
+                const URL = "http://localhost:8000/api/midi-upload/"
+                const response = await axios.post(URL, formData, {
                     headers: {
-                        'Content-Type': 'multipart/form-data'
+                        'Content-Type': 'multipart/form-data',
+                        'X-CSRFToken': csrftoken
                     }
                 });
                 setAnalysisResponse(response.data.chords);
@@ -183,7 +189,7 @@ export default function Analysis() {
             <>
             {renderPlot("Tension Change",analysisResponse.tension_change,"#E72222")}
             {renderPlot("Color Change",analysisResponse.color_change,"#00965F")}
-            {renderPlot("Freshness",analysisResponse.freshness_ls,"#1A43BF")}
+            {renderPlot("Theta Change",analysisResponse.chord_theta,"#1A43BF")}
             </>
     
 

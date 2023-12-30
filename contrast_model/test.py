@@ -1,29 +1,33 @@
-from Chord import *
+from chord_extractor.extractors import Chordino
+import pandas as pd
 import matplotlib.pyplot as plt
-import numpy as np
 
+# Initialize Chordino
+chordino = Chordino(roll_on=1)
 
-# Define the Circle of Fifths
-circle_of_fifths = ['C', 'G', 'D', 'A', 'E', 'B', 'F#', 'Db', 'Ab', 'Eb', 'Bb', 'F']
+# Run extraction on the provided MIDI file
+chords = chordino.extract('E:\\dev\\Music-Outlier-Browser\\music\\special\\4536251\\zcddy_chord.mid')
 
-# Define the angles for each note in the Circle of Fifths (dividing the circle into 12 parts)
-angles_circle_of_fifths = np.linspace(0, 2 * np.pi, len(circle_of_fifths), endpoint=False)
+# Create a list to store chord names, initializing with 0
+chord_name_ls = [0]
 
-# Create a polar plot
-fig, ax = plt.subplots(subplot_kw={'projection': 'polar'}, figsize=(8, 8))
+# Extract chord names from the extracted chords and add them to the list
+for c in chords:
+    chord_name_ls.append(c.chord)
 
-# Plot the chords in blue
-for chord, (r, theta) in all_chord_coordinates().items():
-    ax.scatter(theta, r, color='blue')  # Chord coordinates in blue
+# Create a DataFrame from the chord names
+df = pd.DataFrame({
+    'chord_name': chord_name_ls
+})
 
-# Plot the Circle of Fifths labels
-for label, angle in zip(circle_of_fifths, angles_circle_of_fifths):
-    ax.text(angle, 11, label, ha='center', va='center', color='black', fontsize=20, backgroundcolor='white')
+# Counting the frequency of each chord
+chord_counts = df['chord_name'].value_counts()
 
-# Customize the plot
-ax.grid(color='black')  # Grid in black
-ax.set_facecolor('white')  # Background color to white
-ax.set_theta_zero_location('N')  # Set the zero point to the top of the plot
-ax.set_theta_direction(-1)  # Set the direction of increasing angles to clockwise
-
+# Plotting the bar chart
+plt.figure(figsize=(10, 6))
+chord_counts.plot(kind='bar')
+plt.xlabel('Chord Name')
+plt.ylabel('Frequency')
+plt.title('Frequency of Chords')
+plt.xticks(rotation=45)
 plt.show()

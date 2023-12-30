@@ -99,6 +99,11 @@ class Chord:
 
     def getNotes(self):
         return self.note_names
+    def getNotesArray(self):
+        notes =[]
+        for n in self.notes:
+            notes.append("{}".format(n))
+        return notes
     def __repr__(self):
         return f"Chord {self.name} ({', '.join([note.name for note in self.notes])})"
 

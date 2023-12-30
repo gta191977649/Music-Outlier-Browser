@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import music21
+import musicpy as mp
 from Chord import *
 import pandas as pd
 import os
@@ -23,7 +24,7 @@ def map_music21(chord_21):
     return Chord(temp)
 
 # read midi file
-FILENAME = r'../music/special/d_c_naxienihenmaoxiandemeng.mid'
+FILENAME = r'E:\\dev\\Music-Outlier-Browser\\music\\special\\4536251\\c_zuichangdedianyin.mid'
 midi = music21.converter.parse(FILENAME)
 chords = midi.chordify().flat.getElementsByClass(music21.chord.Chord)
 chord_name_ls = []
@@ -32,7 +33,8 @@ color_chord_ls = []
 chord_theta_ls = []
 for chord in chords:
     #chord_name_ls.append(chord.pitchedCommonName)
-    chord_name_ls.append(map_music21(chord).notes)
+    notes = map_music21(chord).getNotesArray()
+    chord_name_ls.append(mp.alg.detect(notes))
     chord_theta_ls.append(map_music21(chord).get_theta()[0])
     color_chord_ls.append(map_music21(chord))
     chord_tension_ls.append(map_music21(chord).get_harmony())
@@ -66,7 +68,7 @@ plt.figure(figsize=(35,5))
 
 # Tension
 plt.subplot(1, 1, 1)
-plt.plot(x_values, df['chord_theta_ls'], marker='o', color='g')
+plt.plot(x_values, df['chord_theta_ls'], marker='o', color='b',drawstyle='steps-post',markersize=2)
 plt.title('chord_theta_ls')
 plt.ylabel('chord_theta_ls')
 plt.xticks(x_values, df['chord_name'], rotation='vertical', fontsize=8)

@@ -129,6 +129,7 @@ export default function Analysis() {
     };
 
     const renderPlot = (title,values_data,color) => {
+
         const data = {
             labels: values_data.map((_, index) => `${index + 1}`),
          
@@ -142,6 +143,7 @@ export default function Analysis() {
                     borderWidth: 1.5,
                     pointRadius: 2,
                     tension: 0.1,
+                    stepped: true,
                 },
             ],
         };
@@ -149,6 +151,7 @@ export default function Analysis() {
         const options = {
             maintainAspectRatio: false,
             responsive: true,
+            
             scales: {
                 y: {
                     beginAtZero: true
@@ -164,6 +167,17 @@ export default function Analysis() {
                             borderColor: '#e72222',
                             borderWidth: 2,
                         }
+                    }
+                },
+                zoom: {
+                    zoom: {
+                      wheel: {
+                        enabled: true,
+                      },
+                      pinch: {
+                        enabled: true
+                      },
+                      mode: 'xy',
                     }
                 },
                 legend: {
@@ -189,7 +203,7 @@ export default function Analysis() {
             <>
             {renderPlot("Tension Change",analysisResponse.tension_change,"#E72222")}
             {renderPlot("Color Change",analysisResponse.color_change,"#00965F")}
-            {renderPlot("Theta Change",analysisResponse.chord_theta,"#1A43BF")}
+            {renderPlot("Theta (Chord) Change",analysisResponse.chord_theta,"#1A43BF")}
             </>
     
 
@@ -269,12 +283,20 @@ export default function Analysis() {
                             return(
                                 <div key={i} class="p-2 bd-highlight flex-chord" style={{color:"#e72222",background:"#ffdddd",fontWeight:"bold"}}>
                                     {chord}
+                                    <br/>
+                                    <small>
+                                        {analysisResponse.chord_theta[i].toFixed(2)}
+                                    </small>
                                 </div>
                             )
                         } else {
                             return(
                                 <div key={i} class="p-2 bd-highlight flex-chord" >
                                     {chord}
+                                    <br/>
+                                    <small>
+                                        {analysisResponse.chord_theta[i].toFixed(2)}
+                                    </small>
                                 </div>
                             )
                         }

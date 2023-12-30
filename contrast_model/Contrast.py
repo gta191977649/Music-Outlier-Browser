@@ -1,7 +1,7 @@
 import music21
 from contrast_model.Chord import *
 import pandas as pd
-
+import musicpy as mp
 class Contrast:
     def __init__(self,file):
         self.file = file
@@ -25,12 +25,17 @@ class Contrast:
 
         return Chord(temp)
 
-    import music21
-    import pandas as pd
+
 
     def anlysis(self):
         file = self.file
         midi = music21.converter.parse(file)
+
+        # ensure only deal with track 1
+        if len(midi.parts) > 0:
+            midi = midi.parts[0]
+
+
         #chords = midi.chordify().flat.getElementsByClass(music21.chord.Chord)
         chords = midi.chordify().flatten().getElementsByClass(music21.chord.Chord)
         default_tempo = 120
@@ -43,7 +48,10 @@ class Contrast:
         chord_theta_ls = []
 
         for chord in chords:
-            chord_name_ls.append(chord.pitchedCommonName)
+            #chord_name_ls.append(chord.pitchedCommonName)
+            notes = self.map_music21(chord).getNotesArray()
+            chord_name_ls.append(mp.alg.detect(notes))
+
             chord_theta_ls.append(self.map_music21(chord).get_theta()[0])
             mapped_chord = self.map_music21(chord)
             color_chord_ls.append(mapped_chord)

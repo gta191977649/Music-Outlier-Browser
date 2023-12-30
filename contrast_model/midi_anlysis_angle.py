@@ -24,7 +24,7 @@ def map_music21(chord_21):
     return Chord(temp)
 
 # read midi file
-FILENAME = r'E:\\dev\\Music-Outlier-Browser\\music\\special\\4536251\\c_zuichangdedianyin.mid'
+FILENAME = r'../music/special/4536251/c_zuichangdedianyin.mid'
 midi = music21.converter.parse(FILENAME)
 chords = midi.chordify().flat.getElementsByClass(music21.chord.Chord)
 chord_name_ls = []

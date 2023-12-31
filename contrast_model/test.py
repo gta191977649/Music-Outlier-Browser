@@ -2,11 +2,11 @@ from chord_extractor.extractors import Chordino
 import pandas as pd
 import matplotlib.pyplot as plt
 
-# Initialize Chordino
+# Initialize Chordinop
 chordino = Chordino(roll_on=1)
 
 # Run extraction on the provided MIDI file
-chords = chordino.extract('E:\\dev\\Music-Outlier-Browser\\music\\special\\4536251\\zcddy_chord.mid')
+chords = chordino.extract('../music/courage.mid')
 
 # Create a list to store chord names, initializing with 0
 chord_name_ls = [0]

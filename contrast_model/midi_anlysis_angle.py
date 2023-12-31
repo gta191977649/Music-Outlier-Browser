@@ -4,6 +4,10 @@ import musicpy as mp
 from Chord import *
 import pandas as pd
 import os
+from matplotlib.pylab import mpl
+plt.rcParams['font.sans-serif']=['Source Han Sans CN']
+plt.rcParams['axes.unicode_minus']=False
+
 def map_music21(chord_21):
     map_21 = {'A': eNote.A,
               'D': eNote.D,
@@ -24,20 +28,25 @@ def map_music21(chord_21):
     return Chord(temp)
 
 # read midi file
-FILENAME = r'../music/special/4536251/c_zuichangdedianyin.mid'
+FILENAME = r'/home/nurupo/Desktop/music/4526/d_c林俊傑 - 那些你很冒險的夢_Chrous.mid'
 midi = music21.converter.parse(FILENAME)
 chords = midi.chordify().flat.getElementsByClass(music21.chord.Chord)
 chord_name_ls = []
 chord_tension_ls = []
 color_chord_ls = []
 chord_theta_ls = []
+
+current_note = None
 for chord in chords:
     #chord_name_ls.append(chord.pitchedCommonName)
+    # Elimiate next dulplicated note
     notes = map_music21(chord).getNotesArray()
-    chord_name_ls.append(mp.alg.detect(notes))
-    chord_theta_ls.append(map_music21(chord).get_theta()[0])
-    color_chord_ls.append(map_music21(chord))
-    chord_tension_ls.append(map_music21(chord).get_harmony())
+    if not current_note == notes:
+        chord_name_ls.append(mp.alg.detect(notes))
+        chord_theta_ls.append(map_music21(chord).get_theta()[0])
+        color_chord_ls.append(map_music21(chord))
+        chord_tension_ls.append(map_music21(chord).get_harmony())
+        current_note = notes
 
 
 color_change_ls = [0]
@@ -64,7 +73,7 @@ df = pd.DataFrame({
 df.to_csv("./contrast.csv")
 x_values = range(len(df))
 
-plt.figure(figsize=(35,5))
+plt.figure(figsize=(10,3))
 
 # Tension
 plt.subplot(1, 1, 1)
@@ -75,5 +84,5 @@ plt.xticks(x_values, df['chord_name'], rotation='vertical', fontsize=8)
 
 plt.suptitle(os.path.basename(FILENAME), fontsize=16)
 plt.tight_layout()
-
+plt.ylim(0, 100)
 plt.show()

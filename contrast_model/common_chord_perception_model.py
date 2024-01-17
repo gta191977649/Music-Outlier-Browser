@@ -104,5 +104,6 @@ for note, degree in notes_degrees.items():
 ax.set_aspect('equal')
 ax.set_rticks([])
 ax.set_title(f"Full Chord Vector Distribution Map: Total {total}")
+plt.savefig('high_res_plot.png', dpi=300)
 
 plt.show()

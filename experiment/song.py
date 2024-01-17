@@ -12,7 +12,8 @@ import matplotlib.pyplot as plt
 import matplotlib.transforms as mtransforms
 from matplotlib.ticker import FuncFormatter
 from scipy.spatial.distance import cdist
-import feature_extract as featureExtractor
+#import feature_extract as featureExtractor
+import experiment.feature_extract as featureExtractor
 def seconds_to_mm_ss(seconds):
     minutes = int(seconds // 60)
     seconds = int(seconds % 60)
@@ -38,9 +39,13 @@ class Song:
             self.artist = "N/A"
             sections = featureExtractor.extractSection(self.file)
             features = featureExtractor.extractFeature(self.y, self.sr, type=self.inspect_feature, filterBank=filterBank)
-            self.section_features = featureExtractor.dspEmbeddingSectonFeature(self.sr,sections,features)
-            self.score, self.sections_contrasts = self.modelContrast(self.section_features)
-            self.max_section = np.argmax(self.sections_contrasts)
+            if self.inspect_feature == "chroma":
+                self.section_features = featureExtractor.dspEmbeddingSectonChroma(self.sr,sections,features)
+            else:
+                self.section_features = featureExtractor.dspEmbeddingSectonFeature(self.sr,sections,features)
+
+            # self.score, self.sections_contrasts = self.modelContrast(self.section_features)
+            # self.max_section = np.argmax(self.sections_contrasts)
 
     def plotSectionDTW(self):
         # 1.Pre-processing

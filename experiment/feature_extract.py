@@ -5,8 +5,12 @@ import numpy as np
 from gammatone import fftweight
 from scipy import interpolate
 import allin1
-from config import CONF
+from sympy.physics.quantum.identitysearch import scipy
+
+#from config import CONF
+from experiment.config import CONF
 import matplotlib.pyplot as plt
+
 
 
 def dspFilterBank(filterBank, y, sr):
@@ -53,7 +57,25 @@ def dspEmbeddingSectonFeature(sr, sections, feature):
         start_frame = librosa.time_to_frames(start_time, sr=sr, hop_length=hop_length)
         end_frame = librosa.time_to_frames(end_time, sr=sr, hop_length=hop_length)
         # Extract the features for this section
+        print(start_frame,end_frame)
         section["feature"] = feature[start_frame:end_frame]
+    return sections
+def dspEmbeddingSectonChroma(sr, sections, chroma):
+    hop_length = 512
+    for section in sections:
+        start_time, end_time = section["time"]
+
+        # Convert time to frames
+        start_frame = librosa.time_to_samples(start_time, sr=sr) // hop_length
+        end_frame = librosa.time_to_samples(end_time, sr=sr) // hop_length
+
+        # Extract the features for this section
+        # Ensure that the slicing does not go beyond the length of the feature array
+        end_frame = min(end_frame, chroma.shape[1])
+
+        # Slice the feature array to get the section's features
+        # The shape of feature_section will be (12, number_of_frames_in_section)
+        section["feature"] = chroma[:, start_frame:end_frame]
     return sections
 
 
@@ -71,6 +93,20 @@ def extractFeature(y, sr, type="loudness", filterBank="mel", normalize=False):
     # Note dspFilterBank returned the spectrogram in powered
     spectrogram = dspFilterBank(filterBank=filterBank, y=y, sr=sr)
 
+    if type == "chroma":
+        #spectrogram = np.abs(librosa.stft(y))
+        y_harm = librosa.effects.harmonic(y=y, margin=8)
+        chroma_harm = librosa.feature.chroma_cqt(y=y_harm, sr=sr)
+        chroma_filter = np.minimum(chroma_harm,
+                                   librosa.decompose.nn_filter(chroma_harm,
+                                                               aggregate=np.median,
+                                                               metric='cosine'))
+        chroma_smooth = scipy.ndimage.median_filter(chroma_filter, size=(1, 9))
+
+        # if filterBank == "mel":
+        #     spectrogram = np.sqrt(spectrogram)
+        #chroma = librosa.feature.chroma_stft(S=spectrogram, sr=sr)
+        return chroma_smooth
     if type == "loudness":
         # Compute loudness
         loudness = np.sum(spectrogram, axis=0)

@@ -201,9 +201,9 @@ export default function Analysis() {
     const renderResponse = () => {
         return (
             <>
-            {renderPlot("Tension Change",analysisResponse.tension_change,"#E72222")}
-            {renderPlot("Color Change",analysisResponse.color_change,"#00965F")}
-            {renderPlot("Theta (Chord) Change",analysisResponse.chord_theta,"#1A43BF")}
+            {renderPlot("Tension Change",analysisResponse.chord_data.tension_change,"#E72222")}
+            {renderPlot("Color Change",analysisResponse.chord_data.color_change,"#00965F")}
+            {renderPlot("Theta (Chord) Change",analysisResponse.chord_data.chord_theta,"#1A43BF")}
             </>
     
 
@@ -254,7 +254,7 @@ export default function Analysis() {
             {/* Audio controls */}
             <div className="card mt-4">
                 <div className="card-header">
-                    PLAYER [TIME:{audioTime},BAR:{currentPosition},CHORD: {currentChord}]
+                    CONTROL [TIME:{audioTime},BAR:{currentPosition},CHORD: {currentChord}]
                 </div>
                 <div className="btn-group" role="group" aria-label="Basic example">
                     <button type="button" className="btn btn-nurupo" onClick={handlePlay}>PLAY</button>
@@ -264,9 +264,10 @@ export default function Analysis() {
 
             </div>
 
+
             <div className="card mt-4">
                 <div className="card-header">
-                    分析
+                    分析 [Key:{analysisResponse.key} {analysisResponse.mode},Tempo:{analysisResponse.tempo} <small>BPM</small>]
                 </div>
                 <div className="card-body">
                     {analysisResponse !== null ? renderResponse() : '[ N/A ]'}
@@ -278,14 +279,14 @@ export default function Analysis() {
                 </div>
                 <Collapse isOpened={chordMapView}>
                 <div class="d-flex flex-wrap">
-                    {analysisResponse !== null ? analysisResponse.chord_name.map((chord,i)=>{
+                    {analysisResponse !== null ? analysisResponse.chord_data.chord_name.map((chord,i)=>{
                         if (i == currentPosition) {
                             return(
                                 <div key={i} class="p-2 bd-highlight flex-chord" style={{color:"#e72222",background:"#ffdddd",fontWeight:"bold"}}>
                                     {chord}
                                     <br/>
                                     <small>
-                                        {analysisResponse.chord_theta[i].toFixed(2)}
+                                        {analysisResponse.chord_data.chord_theta[i].toFixed(2)}
                                     </small>
                                 </div>
                             )
@@ -295,7 +296,7 @@ export default function Analysis() {
                                     {chord}
                                     <br/>
                                     <small>
-                                        {analysisResponse.chord_theta[i].toFixed(2)}
+                                        {analysisResponse.chord_data.chord_theta[i].toFixed(2)}
                                     </small>
                                 </div>
                             )

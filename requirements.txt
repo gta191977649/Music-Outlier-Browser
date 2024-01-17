@@ -21,3 +21,4 @@ tslearn~=0.6.2
 pygame~=2.5.2
 gammatone~=1.0.1
 music21
+chord-extractor

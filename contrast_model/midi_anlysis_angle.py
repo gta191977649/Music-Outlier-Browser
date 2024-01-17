@@ -28,8 +28,10 @@ def map_music21(chord_21):
     return Chord(temp)
 
 # read midi file
-FILENAME = r'/home/nurupo/Desktop/music/4526/d_c林俊傑 - 那些你很冒險的夢_Chrous.mid'
+FILENAME = r'../music/marigold_chord.mid'
 midi = music21.converter.parse(FILENAME)
+key = midi.analyze("key")
+print(key)
 chords = midi.chordify().flat.getElementsByClass(music21.chord.Chord)
 chord_name_ls = []
 chord_tension_ls = []
@@ -73,7 +75,7 @@ df = pd.DataFrame({
 df.to_csv("./contrast.csv")
 x_values = range(len(df))
 
-plt.figure(figsize=(10,3))
+plt.figure(figsize=(12, 3))
 
 # Tension
 plt.subplot(1, 1, 1)
@@ -84,5 +86,8 @@ plt.xticks(x_values, df['chord_name'], rotation='vertical', fontsize=8)
 
 plt.suptitle(os.path.basename(FILENAME), fontsize=16)
 plt.tight_layout()
-plt.ylim(0, 100)
+#plt.ylim(0, 100)
+# Set x-axis limits
+plt.xlim(left=0, right=max(x_values))
+
 plt.show()

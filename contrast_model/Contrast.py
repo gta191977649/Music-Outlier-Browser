@@ -30,7 +30,7 @@ class Contrast:
     def anlysis(self):
         file = self.file
         midi = music21.converter.parse(file)
-
+        key = midi.analyze("key")
         # ensure only deal with track 1
         if len(midi.parts) > 0:
             midi = midi.parts[0]
@@ -84,4 +84,9 @@ class Contrast:
             'freshness_ls': freshness_ls,
             'chord_timing_ls':chord_timing_ls,
         })
-        return df
+        return {
+            "key": key.tonic.name,
+            "mode": key.mode,
+            "tempo": tempo,
+            "chord_data": df,
+        }

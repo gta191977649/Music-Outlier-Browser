@@ -2686,6 +2686,11 @@
   resolved "https://registry.yarnpkg.com/@uwdata/kde/-/kde-0.0.2.tgz#48be0dcbd4c622eee3b97f28cb3668692603ecba"
   integrity sha512-RF4U42TzML1MdPCAgOUegHELpjQRA4dkNO/IfOE+H9FF4EHLeA07BHjcEh1fKmzV/1B3cRVfJgIvTIqwpx7d9A==
 
+"@wavesurfer/react@^1.0.4":
+  version "1.0.4"
+  resolved "https://registry.npmmirror.com/@wavesurfer/react/-/react-1.0.4.tgz#577bf84152bd25bd7ba6635a5b1694a57e6f6161"
+  integrity sha512-6WkXLhh0EaytyK1B6JqHZmzHQlBz+nbGH5x009tUH6nUIFFXq7zwkDEXqeZuWyVTKgjqcOQGOgavSZ7EbsS6lA==
+
 "@webassemblyjs/ast@1.11.6", "@webassemblyjs/ast@^1.11.5":
   version "1.11.6"
   resolved "https://registry.yarnpkg.com/@webassemblyjs/ast/-/ast-1.11.6.tgz#db046555d3c413f8966ca50a95176a0e2c642e24"
@@ -11690,6 +11695,11 @@ watchpack@^2.4.0:
   dependencies:
     glob-to-regexp "^0.4.1"
     graceful-fs "^4.1.2"
+
+wavesurfer.js@^7.6.4:
+  version "7.6.4"
+  resolved "https://registry.npmmirror.com/wavesurfer.js/-/wavesurfer.js-7.6.4.tgz#37257a84500ab5061eb70e38d400b3c6d7266b1f"
+  integrity sha512-ZpGOHzFeShTD02OoXNSoo9hfHM7awPckNjlRuCbLb9eKcHTJB8tEE+REkNOwJKJ46uo0cT7VeRbMlVvKgzUV/w==
 
 wbuf@^1.1.0, wbuf@^1.7.3:
   version "1.7.3"

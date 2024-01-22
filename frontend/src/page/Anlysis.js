@@ -1,4 +1,4 @@
-import React, { useState,useRef,useEffect } from 'react';
+import React, { useState,useRef,useEffect,useMemo } from 'react';
 import {Collapse} from 'react-collapse';
 
 import axios from 'axios';
@@ -17,6 +17,8 @@ import {
 import { Line,Bar } from 'react-chartjs-2';
   
 import annotationPlugin from 'chartjs-plugin-annotation';
+import WavesurferPlayer from '@wavesurfer/react'
+
 
 // Registering components and plugin for Chart.js
 ChartJS.register(
@@ -40,6 +42,10 @@ export default function Analysis() {
     const [audio, setAudio] = useState(null);
     const [audioTime, setAudioTime] = useState(0);
     const [chordMapView, setChordMapView] = useState(false);
+    const [wavesurfer, setWavesurfer] = useState(null)
+
+    
+
 
     const handlePlay = () => {
         if (audio) {
@@ -64,12 +70,12 @@ export default function Analysis() {
         const currentTime = audio.currentTime;
         setAudioTime(currentTime);
 
-        const chordTimings = analysisResponse.chord_timing_ls;
+        const chordTimings = analysisResponse.chord_data.chord_timing_ls;
         for (let i = 0; i < chordTimings.length; i++) {
             const [startTime, , endTime] = chordTimings[i];
             if (currentTime >= startTime && currentTime <= endTime) {
                 setCurrentPosition(i); // Set the position to the index of the current chord
-                setCurrentChord(analysisResponse.chord_name[i])
+                setCurrentChord(analysisResponse.chord_data.chord_name[i])
                 break; // Exit the loop once the correct index is found
             }
         }
@@ -83,12 +89,14 @@ export default function Analysis() {
             console.log(selectedFile.name); // For debugging
         }
     };
+
     const handleWaveFileSelect = (event) => {
         const selectedFile = event.target.files[0];
         if (selectedFile) {
             setWaveFile(selectedFile);
             const audioUrl = URL.createObjectURL(selectedFile);
             setAudio(new Audio(audioUrl));
+            
         }
     };
 
@@ -201,14 +209,22 @@ export default function Analysis() {
     const renderResponse = () => {
         return (
             <>
-            {renderPlot("Tension Change",analysisResponse.chord_data.tension_change,"#E72222")}
-            {renderPlot("Color Change",analysisResponse.chord_data.color_change,"#00965F")}
-            {renderPlot("Theta (Chord) Change",analysisResponse.chord_data.chord_theta,"#1A43BF")}
+                <WavesurferPlayer
+                    height={100}
+                    waveColor="blue"
+                    url={URL.createObjectURL(waveFile)}
+                />
+                {renderPlot("Tension Change",analysisResponse.chord_data.tension_change,"#E72222")}
+                {renderPlot("Color Change",analysisResponse.chord_data.color_change,"#00965F")}
+                {renderPlot("Theta (Chord) Change",analysisResponse.chord_data.chord_theta,"#1A43BF")}
             </>
     
 
         )
     };
+    const onReady = (ws) => {
+        setWavesurfer(ws)
+    }
 
     return (
       
@@ -266,8 +282,9 @@ export default function Analysis() {
 
 
             <div className="card mt-4">
+            
                 <div className="card-header">
-                    分析 [Key:{analysisResponse.key} {analysisResponse.mode},Tempo:{analysisResponse.tempo} <small>BPM</small>]
+                    分析  {analysisResponse ? `Key:${analysisResponse.key} ${analysisResponse.mode},Tempo:${analysisResponse.tempo} BPM` :""}
                 </div>
                 <div className="card-body">
                     {analysisResponse !== null ? renderResponse() : '[ N/A ]'}

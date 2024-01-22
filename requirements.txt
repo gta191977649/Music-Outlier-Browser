@@ -5,7 +5,6 @@ django-cors-headers
 matplotlib~=3.6.3
 seaborn~=0.12.2
 numpy~=1.23.5
-natten~=0.14.6
 setuptools~=67.1.0
 scipy~=1.10.0
 pybind11~=2.10.3
@@ -22,3 +21,4 @@ pygame~=2.5.2
 gammatone~=1.0.1
 music21
 chord-extractor
+musicpy

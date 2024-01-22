@@ -8,3 +8,5 @@ An Intractative plaform allow you to browser music based on various forms
 # Requirement 
 *  **Python 3.9**
 * Install requirments.txt
+# Note
+* Vamp plugins may not work on m1 based mac.

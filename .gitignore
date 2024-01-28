@@ -9,3 +9,4 @@ experiment/demix/
 experiment/__pycache__/
 *.pyc
 *.pyc
+dataset/*

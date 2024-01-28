@@ -229,7 +229,7 @@ export default function Analysis() {
     return (
       
         <div className='container mt-5'>
-            <h2>Contrast Analysis { wait ? <span class="spinner-border" role="status"></span> :""}</h2>
+            <h2>Pattern Analysis { wait ? <span class="spinner-border" role="status"></span> :""}</h2>
 
             <div className="card">
                 <div className="card-body">

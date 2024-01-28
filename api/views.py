@@ -9,11 +9,12 @@ from django.db import connection
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
-from .models import MidiFile
-from .serializers import MidiFileSerializer
+from .models import MidiFile,AudioFile
+from .serializers import MidiFileSerializer,AudioFileSerializer
 import outlier.outlier
 from outlier.outlier import Outlier
 from contrast_model.Contrast import *
+from chordify.Chordify import *
 import numpy as np
 import music21
 
@@ -122,4 +123,31 @@ class MidiFileUploadView(APIView):
     def analyze_midi(self, file_path):
         # anlysis
         model = Contrast(file_path)
+        return model.anlysis()
+# deal with audio anylsis
+class AudioFileUploadView(APIView):
+    parser_classes = [MultiPartParser, FormParser]
+
+    def post(self, request, *args, **kwargs):
+        serializer = AudioFileSerializer(data=request.data)
+        if serializer.is_valid():
+            uploaded_file = request.FILES.get('file')
+            file_hash = calculate_file_hash(uploaded_file)
+
+            existing_file = AudioFile.objects.filter(file_hash=file_hash).first()
+            if existing_file:
+                print("File already exists, use existing file for analysis")
+                chords = self.analyzeanalyze_chord_chord(existing_file.file.path)
+            else:
+                # Save new file and analyze
+                midi_file = serializer.save(file_hash=file_hash)
+                chords = self.analyze_chord(midi_file.file.path)
+
+            return Response({'chords': chords}, status=200)
+        else:
+            return Response(serializer.errors, status=400)
+
+    def analyze_chord(self, file_path):
+        # anlysis
+        model = Chordify(file_path)
         return model.anlysis()

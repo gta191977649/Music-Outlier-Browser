@@ -41,6 +41,8 @@ def cartesian_to_polar(x, y):
     return r, np.degrees(theta)
 
 def compute_chord_vectors(chord_notes):
+    # for note in chord_notes:
+    #     print(notes_degrees[note])
     chord_angles_rad = [np.deg2rad(notes_degrees[note]) for note in chord_notes]
     chord_vectors = np.array([np.cos(chord_angles_rad), np.sin(chord_angles_rad)])
     return np.sum(chord_vectors, axis=1)
@@ -54,21 +56,22 @@ def plot_model(chord_notes, sum_vector, ax):
     #ax.text(np.deg2rad(sum_vector_polar[1]), sum_vector_polar[0], label, fontsize=8, ha='left')
 
     return sum_vector_polar
+fig, ax = plt.subplots(subplot_kw={'projection': 'polar'},figsize=(5, 5))
 
-fig, ax = plt.subplots(subplot_kw={'projection': 'polar'})
-
-total = 0
 
 for root_note in notes_degrees:
-    chords = generate_chords_within_sixth(root_note)
+    #chords = generate_chords_within_sixth(root_note)
+    chords = [['C','C'],['C','G'],['C','D'],['C','A'],['C','E'],['C','B'],['C','F#']]
     print(root_note)
     for chord_notes in chords:
         sum_vector = compute_chord_vectors(chord_notes)
         sum_vector_polar = plot_model(chord_notes, sum_vector, ax)
         print(f"{chord_notes}: ({sum_vector_polar[0]},{sum_vector_polar[1]})")
-        total += 1
+
 
 # Circle of fifths line
+
+
 sorted_notes = sorted(notes_degrees.items(), key=lambda x: x[1])
 for i, ((note1, deg1), (note2, deg2)) in enumerate(zip(sorted_notes, sorted_notes[1:] + sorted_notes[:1])):
     angle1, angle2 = np.deg2rad(deg1), np.deg2rad(deg2)
@@ -80,6 +83,6 @@ for note, degree in notes_degrees.items():
 
 ax.set_aspect('equal')
 ax.set_rticks([])
-ax.set_title(f"Full Chord Vector Distribution Map: Total {total}")
-
+ax.set_title(f"Example of C Major")
+plt.savefig("example_chord")
 plt.show()

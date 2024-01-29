@@ -28,7 +28,7 @@ def map_music21(chord_21):
     return Chord(temp)
 
 # read midi file
-FILENAME = r'../music/marigold_chord.mid'
+FILENAME = r'../dataset/data/test/最长的电影.mid'
 midi = music21.converter.parse(FILENAME)
 key = midi.analyze("key")
 print(key)
@@ -67,11 +67,12 @@ for i in range(len(chord_name_ls) - 1):
 df = pd.DataFrame({
     'chord_name': chord_name_ls,
     'chord_tension': chord_tension_ls,
-    'chord_theta_ls': chord_theta_ls,
+    'chord_theta': chord_theta_ls,
     'color_change': color_change_ls,
     'tension_change': tension_change_ls,
     'freshness': freshness_ls})
 
+print(df)
 df.to_csv("./contrast.csv")
 x_values = range(len(df))
 
@@ -79,9 +80,9 @@ plt.figure(figsize=(12, 3))
 
 # Tension
 plt.subplot(1, 1, 1)
-plt.plot(x_values, df['chord_theta_ls'], marker='o', color='b',drawstyle='steps-post',markersize=2)
-plt.title('chord_theta_ls')
-plt.ylabel('chord_theta_ls')
+plt.plot(x_values, df['chord_theta'], marker='o', color='b',drawstyle='steps-post',markersize=2)
+plt.title('chord_theta')
+plt.ylabel('chord_theta')
 plt.xticks(x_values, df['chord_name'], rotation='vertical', fontsize=8)
 
 plt.suptitle(os.path.basename(FILENAME), fontsize=16)

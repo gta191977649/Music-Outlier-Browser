@@ -2,9 +2,6 @@ import numpy as np
 import scipy
 import matplotlib.pyplot as plt
 import librosa
-import libfmp.b
-import libfmp.c3
-import libfmp.c4
 from chordify.feature_extractor import *
 import os
 

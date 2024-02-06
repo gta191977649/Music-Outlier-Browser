@@ -68,7 +68,7 @@ def write_chord_file(filename,chords,beats):
     for b in beats:
         bts.append(b[0])
 
-    f = open(lab_file_path + ".lab", "w")
+    f = open(lab_file_path , "w")
     f.write(lab_file)
     f.close()
 

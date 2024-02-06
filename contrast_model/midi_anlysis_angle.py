@@ -43,12 +43,12 @@ for chord in chords:
     #chord_name_ls.append(chord.pitchedCommonName)
     # Elimiate next dulplicated note
     notes = map_music21(chord).getNotesArray()
-    if not current_note == notes:
-        chord_name_ls.append(mp.alg.detect(notes))
-        chord_theta_ls.append(map_music21(chord).get_theta()[0])
-        color_chord_ls.append(map_music21(chord))
-        chord_tension_ls.append(map_music21(chord).get_harmony())
-        current_note = notes
+
+    chord_name_ls.append(mp.alg.detect(notes))
+    chord_theta_ls.append(map_music21(chord).get_theta()[0])
+    color_chord_ls.append(map_music21(chord))
+    chord_tension_ls.append(map_music21(chord).get_harmony())
+
 
 
 color_change_ls = [0]

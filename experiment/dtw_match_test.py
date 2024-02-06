@@ -35,11 +35,11 @@ single_matches_signal2 = {idx for idx, count in counter_signal2.items() if count
 plt.figure(figsize=(20, 4))
 
 # Plot signal1
-plt.plot(signal1, label='Signal 1', drawstyle='steps-post')
+plt.plot(signal1, label='Chord Signal 1', drawstyle='steps-post')
 
 # Shift signal2 downwards for clarity and plot
 shift_down = 2 * np.max(signal1)  # Calculate a suitable shift value
-plt.plot(np.arange(len(signal2)) * len(signal1) / len(signal2), signal2 - shift_down, label='Signal 2 (shifted down)', drawstyle='steps-post')
+plt.plot(np.arange(len(signal2)) * len(signal1) / len(signal2), signal2 - shift_down, label='Chord Signal 2 (shifted down)', drawstyle='steps-post')
 
 # Draw lines connecting the matched pairs
 for idx1, idx2 in path:

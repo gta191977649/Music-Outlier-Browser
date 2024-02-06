@@ -10,7 +10,7 @@ INDEX_NOTE_DICT = {v: k for k, v in NOTE_VAL_DICT.items()}
 
 
 # chord = autochord.recognize('../music/bic.mp3', lab_fn='../music/bic.lab')
-path = "../dataset/data/blue_oyster_cult/h5/TRNPHLU128F42655FA.h5"
+path = "../dataset/data/blue_oyster_cult/h5/TRPSSSL128F4267C28.h5"
 file = h5.open_h5_file_read(path)
 chroma = h5.get_segments_pitches(file)
 time = h5.get_duration(file)

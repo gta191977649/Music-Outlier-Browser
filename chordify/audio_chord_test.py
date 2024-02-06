@@ -24,20 +24,23 @@ from pathlib import Path
 import madmom
 import numpy as np
 from madmom.audio.chroma import DeepChromaProcessor
-from madmom.features.chords import DeepChromaChordRecognitionProcessor
+from madmom.features.chords import DeepChromaChordRecognitionProcessor,CRFChordRecognitionProcessor,CNNChordFeatureProcessor
 from madmom.features.key import CNNKeyRecognitionProcessor,key_prediction_to_label
 
 
-PATH = '../music/AKB48_kiminomelody.mp3'
+PATH = '../msd/beat_track.mp3'
+
+
 dcp = DeepChromaProcessor()
 decode = DeepChromaChordRecognitionProcessor()
 chroma = dcp(PATH)
 
 chords = decode(chroma)
-proc = CNNKeyRecognitionProcessor()
-
-key_class_prob = proc(PATH)
-print(key_prediction_to_label(key_class_prob))
+#
+# featproc = CNNChordFeatureProcessor()
+# feats = featproc(PATH)
+# decode_cnn = CRFChordRecognitionProcessor()
+# chords = decode_cnn(feats)
 
 lab_file = ""
 for chord in chords:
@@ -50,5 +53,5 @@ f = open(PATH+".lab","w")
 f.write(lab_file)
 f.close()
 
-librosa.display.specshow(chroma.T, y_axis='chroma', x_axis='time')
-plt.show()
+# librosa.display.specshow(chroma.T, y_axis='chroma', x_axis='time')
+# plt.show()

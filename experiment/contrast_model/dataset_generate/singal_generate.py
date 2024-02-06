@@ -59,7 +59,7 @@ def getChordVectorsFromFile(PATH_CHORD):
     return chords
 if __name__ == '__main__':
     # Chord File
-    BASE_PATH = "/Users/nurupo/Desktop/dev/Music-Outlier-Browser/dataset/data/blue_oyster_cult"
+    BASE_PATH = "/Users/nurupo/Desktop/dev/Music-Outlier-Browser/dataset/data/colin_meloy"
     # Feed Chord Progression with Transposed or Original Key
     TRANSPOSED = True
     count = 0

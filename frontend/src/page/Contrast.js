@@ -9,6 +9,8 @@ import WaveSurfer from 'wavesurfer.js';
 import RegionsPlugin from "wavesurfer.js/dist/plugins/regions";
 import TimelinePlugin from "wavesurfer.js/dist/plugins/timeline";
 import SpectrogramPlugin from "wavesurfer.js/dist/plugins/spectrogram";
+import WebAudio from 'wavesurfer.js/dist/webaudio.js'
+
 //import MarkerPlugin from "wavesurfer.js/dist/plugins/marker";
 import * as Tone from 'tone'
 
@@ -25,6 +27,7 @@ export default function Contrast() {
 
     const [currentTime, setCurrentTime] = useState(0);
     const [currentChordName, setChordChordName] = useState("N/A");
+    const SIGNAL_OFFSET = 0.1
     let lastEnteredRegionRef = useRef(0);
 
 
@@ -73,7 +76,7 @@ export default function Contrast() {
           'Bbm': '#FF8000', 'Bbm7': '#FF8000',
       
         'B': '#FFC000', 'BM7': '#FFC000', 'B7': '#FFC000',
-          'Bm': '#FFE000', 'Bm7': '#FFE000',
+          'Bm': '#FFE000', 'Bm7': '#FFE000','N':"#808080",'X':"#808080",
     };
     const chordMappings = {
       // Major Chords
@@ -181,57 +184,59 @@ export default function Contrast() {
         });
 
     }
-    const visualizeChords = (chordLabels) =>{
-
-        let baseColorMap = ["#4A9CBB", "#9D6AFF"]
-        let prevChord = 'N';
-        let waveObj = wavesurferRef.current.plugins[0]
-        waveObj.clearRegions();
-        // waveObj.clearMarkers();
-      
-        chordLabels.forEach((line, i) => {
-          if (!line) // empty
-            return // continue
-      
-          let labelComps = line.split('\t')
-          if (labelComps.length != 3)
-            return // continue
-      
-          let st = labelComps[0];
-          let ed = labelComps[1];
-          let chordName = labelComps[2];
-          chordName = chordName.replace(':maj7','M7').replace(':min7','m7')
-                               .replace(':maj','').replace(':min', 'm').replace(':','')
-      
-          if ((chordName == "N") || (chordName == "X"))
-            return // continue
-      
-          let color = "#4A9CBB"; // default
-          if (chordName in chordColor)
-            color = chordColor[chordName]
-      
-          let region = waveObj.addRegion({
-            start: st,
-            end: ed,
-            color: color.concat("77"),
-            drag: false, resize: false
-          })
-          regionsRef.current[region.id] = region;
-          if (chordName != prevChord) {
-            region.setContent(chordName)
-            //content
-            // waveObj.addMarker({
-            //   time: st,
-            //   label: chordName,
-            //   color: color.concat("EE"),
-            //   position: "top"
-            // })
+    const visualizeChords = (chordLabels) => {
+      let baseColorMap = ["#4A9CBB", "#9D6AFF"]
+      let prevChord = 'N';
+      let waveObj = wavesurferRef.current.plugins[0]
+      waveObj.clearRegions();
+      let downBeatStartTime = 0;
+      let beat_time = 0;
+      let beatCounter = 0; // Initialize a counter to keep track of beats
+      chordLabels.forEach((line, i) => {
+        if (!line) return
+        let labelComps = line.split('\t')
+        if (labelComps.length != 3) return
+  
+        let start_time = parseFloat(labelComps[0]);
+        let beat_number = parseInt(labelComps[1], 10);
+  
+        // Increment beatCounter and reset if it reaches 4
+        beatCounter = beat_number === 1 ? 1 : beatCounter + 1;
+  
+        // Calculate beat_time at every 4th beat or when the beat starts over
+        if (beat_number === 4 || beatCounter === 1) {
+          if (i >= 3) {
+            downBeatStartTime = parseFloat(chordLabels[i - 3].split('\t')[0]); // Start of the bar
+            beat_time = (start_time - downBeatStartTime) / 3; // Divided by 3 because it's the difference between 4 beats
+          } else {
+            // Handle the case for the first few chords before enough data is available
+            downBeatStartTime = start_time; // Fallback to current start time
+            beat_time = 0; // No beat time can be calculated yet
           }
-      
-          
-          prevChord = chordName
-        });
+        }
+  
+        let chordName = labelComps[2].replace(':maj7', 'M7').replace(':min7', 'm7')
+                                     .replace(':maj', '').replace(':min', 'm').replace(':', '');
+  
+        // Continue the loop for chords named "N" or "X" after updating beat time
+        // if (chordName === "N" || chordName === "X") return;
+  
+        let color = baseColorMap[0]; // default color, you may want to change logic for color
+        if (chordName in chordColor)
+          color = chordColor[chordName]
+        
+        let region = waveObj.addRegion({
+          start: start_time-SIGNAL_OFFSET,
+          end: (start_time + beat_time)-SIGNAL_OFFSET, // This assumes constant beat time for each chord in the bar
+          color: color.concat("77"),
+          drag: false,
+          resize: false
+        })
+        regionsRef.current[region.id] = region;
+        region.setContent(`${chordName}\n${beat_number}`)
+      });
     }
+    
     const readChordFile = (file) => {
         const reader = new FileReader();
 
@@ -263,6 +268,7 @@ export default function Contrast() {
 
         // Load the selected wave file into WaveSurfer
         const objectURL = URL.createObjectURL(file);
+        
         wavesurferRef.current.load(objectURL);
     };
 
@@ -287,31 +293,38 @@ export default function Contrast() {
       const notes = chordMappings[chordName];
       if (notes) {
           // `notes` can be an array of strings like ["C4", "E4", "G4"]
+          
           chordSynth.current.triggerAttackRelease(notes, '4n'); // '1n' represents a whole note. You can change the duration as needed.
-      } else {
+          console.log(chordName)
+        } else {
           console.log('Chord not found:', chordName);
       }
   };
-    const checkForRegionEntry = (currentTime) => {
-      Object.values(regionsRef.current).forEach((region,idx) => {
-          if (currentTime >= region.start && currentTime <= region.end && lastEnteredRegionRef !== region.id) {
-            let chord = region.content.textContent
-            setChordChordName(chord)
-            playChord(chord)
-            console.log('Chord:', chord);
-            lastEnteredRegionRef = region.id
+    // const checkForRegionEntry = (currentTime) => {
+    //   Object.values(regionsRef.current).forEach((region,idx) => {
+    //       if (currentTime >= region.start && currentTime <= region.end && lastEnteredRegionRef !== region.id) {
+    //         let chord = region.content.textContent
+    //         setChordChordName(chord)
+    //         playChord(chord)
+    //         console.log('Chord:', chord);
+    //         lastEnteredRegionRef = region.id
             
-              // Perform your action for region entry
-              // Ensure you handle the case where you're continuously within the region
-          }
-      });
-    };
+    //           // Perform your action for region entry
+    //           // Ensure you handle the case where you're continuously within the region
+    //       }
+    //   });
+    // };
   
     // Clean up WaveSurfer instance on component unmount
     useEffect(() => {
         if(!chordSynth.current) {
-          chordSynth.current = new Tone.PolySynth(Tone.Synth).toDestination();
+          const context = new Tone.Context({ latencyHint: "interactive" });
+          Tone.setContext(context);
 
+          chordSynth.current = new Tone.PolySynth(Tone.AMSynth).toDestination();
+          console.log(Tone.getContext().latencyHint);
+
+        
         }
         // Setup WaveSurfer instance
         if (!wavesurferRef.current) {
@@ -320,7 +333,7 @@ export default function Contrast() {
             // Listen to the 'audioprocess' event to update the current play time
             wavesurferRef.current.on('audioprocess', (time) => {
                 setCurrentTime(time);
-                checkForRegionEntry(time);
+                //checkForRegionEntry(time);
             });
 
             // Also update time when audio finishes playing
@@ -331,10 +344,13 @@ export default function Contrast() {
             wavesurferRef.current.on('region-created', (region) => {
               console.log("reg created")
             });
-            wavesurferRef.current.on('region-in', (region) => {
+            wavesurferRef.current.plugins[0].on('region-in', (region) => {
              
-              console.log('Entered region:', region);
-              // You can access the region's properties here, e.g., region.id or region.start
+              //console.log('Entered region:', region.content);
+              let chord_c = region.content.textContent
+              let chord = chord_c.split("\n")[0]
+              setChordChordName(chord)
+              playChord(chord)
             });
             console.log(wavesurferRef.current)
             console.log("wavesurferRef created")

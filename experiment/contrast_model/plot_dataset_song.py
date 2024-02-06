@@ -2,8 +2,11 @@ from contrast_model.Chord import Chord as VectorModel
 from contrast_model.Chord import eNote
 from pychord import Chord
 import pandas as pd
-import matplotlib.pyplot as plt
 import h5.hdf5_getters as h5
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+import matplotlib.ticker as ticker
+
 def map_music21(chord_21,name):
     map_21 = {'A': eNote.A,
               'D': eNote.D,
@@ -41,6 +44,7 @@ def getChordVectorsFromFile(PATH_CHORD):
                 start, end, chord_str = parts
                 # SKIP NONE CHORD
                 if chord_str in ["N", "None"]: continue
+                chord_str = chord_str.replace(":", "")
                 c = Chord(chord_str)
                 notes = c.components()
                 v = map_music21(notes, chord_str)
@@ -53,10 +57,11 @@ def getChordVectorsFromFile(PATH_CHORD):
 
 if __name__ == '__main__':
     ARTIST = "blue_oyster_cult"
-    SONG_ID = "TRCQZAG128F427DB97"
+    SONG_ID = "TRPSSSL128F4267C28"
     # Chord File
-    PATH_CHORD = "/Users/nurupo/Desktop/dev/Music-Outlier-Browser/dataset/data/{}/chord/{}_transposed.lab".format(
-        ARTIST, SONG_ID)
+    # PATH_CHORD = "/Users/nurupo/Desktop/dev/Music-Outlier-Browser/dataset/data/{}/chord/{}_transposed.lab".format(
+    #     ARTIST, SONG_ID)
+    PATH_CHORD = "/Users/nurupo/Desktop/dev/Music-Outlier-Browser/music/final_countdown.mp3.lab"
     PATH_FILE = "/Users/nurupo/Desktop/dev/Music-Outlier-Browser/dataset/data/{}/h5/{}.h5".format(ARTIST, SONG_ID)
     chords = getChordVectorsFromFile(PATH_CHORD)
     chord_name_ls = []
@@ -84,7 +89,7 @@ if __name__ == '__main__':
     artist = h5.get_artist_name(song).decode('utf-8')
 
     x_values = range(len(df))
-    plt.figure(figsize=(20, 4))
+    plt.figure(figsize=(30, 4))
     plt.subplot(1, 1, 1)
     plt.plot(x_values, df['chord_theta'], marker='o', color='b', drawstyle='steps-post', markersize=2)
     plt.title("{} - {}".format(artist, title))

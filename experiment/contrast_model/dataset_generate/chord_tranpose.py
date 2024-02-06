@@ -67,7 +67,7 @@ def transpose_chord_progression(h5_file,input_file, output_file, transpose_amoun
             file.write(line + "\n")
 
 if __name__ == '__main__':
-    BASE_PATH = "/Users/nurupo/Desktop/dev/Music-Outlier-Browser/dataset/data/blue_oyster_cult"
+    BASE_PATH = "/Users/nurupo/Desktop/dev/Music-Outlier-Browser/dataset/data/colin_meloy"
     # PATH_H5 = "/Users/nurupo/Desktop/dev/Music-Outlier-Browser/dataset/data/blue_oyster_cult/h5/TRZARJQ128F42679C9.h5"
     # PATH_CHORD = "/Users/nurupo/Desktop/dev/Music-Outlier-Browser/dataset/data/blue_oyster_cult/chord/TRZARJQ128F42679C9.lab"
 

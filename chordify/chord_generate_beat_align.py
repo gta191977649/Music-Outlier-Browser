@@ -6,7 +6,7 @@ import librosa
 import soundfile as sf
 
 if __name__ == '__main__':
-    audio_file_name = "../music/final_countdown.mp3"
+    audio_file_name = "../music/41. Waltz For Work.mp3"
     chord_processor = DeepChromaProcessor()
     chord_decoder = DeepChromaChordRecognitionProcessor()
     chords = chord_decoder(chord_processor(audio_file_name))

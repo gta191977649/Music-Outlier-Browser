@@ -19,5 +19,6 @@ if __name__ == '__main__':
                 file = h5.open_h5_file_read(PATH_H5_FILE)
                 time_signature = h5.get_time_signature(file)
                 if os.path.exists(PATH_WAV):
-                    print(PATH_WAV)
+                    title = h5.get_title(file).decode('utf-8')
+                    print(time_signature,title)
 

@@ -19,6 +19,8 @@ import * as Tone from 'tone'
 export default function Contrast() {
     const [chord_file, setChordFile] = useState(null);
     const [waveFile, setWaveFile] = useState(null);
+    const [chordMap, setChordMap] = useState([])
+    const [currentRegionStart,setRegionStart] = useState(0)
     const waveformRef = useRef(null); 
     const timelineRef = useRef(null);
     const chordSynth = useRef(null);
@@ -27,7 +29,7 @@ export default function Contrast() {
 
     const [currentTime, setCurrentTime] = useState(0);
     const [currentChordName, setChordChordName] = useState("N/A");
-    const SIGNAL_OFFSET = 0.1
+    const SIGNAL_OFFSET = 0.3
     let lastEnteredRegionRef = useRef(0);
 
 
@@ -149,7 +151,31 @@ export default function Contrast() {
       'A#7': ['A#4', 'D5', 'F5', 'G#5'],
       'B7': ['B4', 'D#5', 'F#5', 'A5'],
   };
-  
+  const convertToFlatColor = (hex) => {
+    if(!hex) {
+      return "lightGrey"
+    }
+   // Convert hex to RGB
+   let r = parseInt(hex.slice(1, 3), 16);
+   let g = parseInt(hex.slice(3, 5), 16);
+   let b = parseInt(hex.slice(5, 7), 16);
+
+   // Reduce the saturation and adjust the brightness to flatten the color
+   // This is a simple approach that mixes the color with a bit of white
+   const mixWithWhite = (component) => Math.min(255, Math.round(component + (255 - component) * 0.5)); 
+
+   r = mixWithWhite(r);
+   g = mixWithWhite(g);
+   b = mixWithWhite(b);
+
+   // Convert back to hex
+   let flatHexR = r.toString(16).padStart(2, '0');
+   let flatHexG = g.toString(16).padStart(2, '0');
+   let flatHexB = b.toString(16).padStart(2, '0');
+
+   return "#" + flatHexR + flatHexG + flatHexB;
+  }
+
     const createWaveSuer = () =>{
         return WaveSurfer.create({
             container: waveformRef.current,
@@ -165,21 +191,7 @@ export default function Contrast() {
                     container: timelineRef,
                     timeInterval: 1,
                 }),
-                // SpectrogramPlugin.create({
-                //   labels: true,
-                //   height: 200,
-                //   splitChannels: false,
-                // })
-                // WaveSurfer.cursor.create({
-                //     showTime: true,
-                //     opacity: 0.5,
-                //     customShowTimeStyle: {
-                //       'padding': '5px',
-                //       'padding-top': '100px',
-                //       'font-size': '12px'
-                //     }
-                // }),
-         
+               
             ],
         });
 
@@ -192,6 +204,7 @@ export default function Contrast() {
       let downBeatStartTime = 0;
       let beat_time = 0;
       let beatCounter = 0; // Initialize a counter to keep track of beats
+      let chords = []
       chordLabels.forEach((line, i) => {
         if (!line) return
         let labelComps = line.split('\t')
@@ -199,7 +212,12 @@ export default function Contrast() {
   
         let start_time = parseFloat(labelComps[0]);
         let beat_number = parseInt(labelComps[1], 10);
-  
+        
+        chords.push({
+          "start_time":start_time,
+          "beat":beat_number,
+          "chord":labelComps[2],
+        })
         // Increment beatCounter and reset if it reaches 4
         beatCounter = beat_number === 1 ? 1 : beatCounter + 1;
   
@@ -235,6 +253,9 @@ export default function Contrast() {
         regionsRef.current[region.id] = region;
         region.setContent(`${chordName}\n${beat_number}`)
       });
+      setChordMap(chords)
+      console.log(chords)
+
     }
     
     const readChordFile = (file) => {
@@ -283,11 +304,15 @@ export default function Contrast() {
       wavesurferRef.current.play();
         
     }
+    const setPlayFromTime = (time) =>{
+      wavesurferRef.current.setTime(time)
+      wavesurferRef.current.play()
+    }
     const handlePause=() =>{
         wavesurferRef.current.pause();
     }
     const handleReset=() =>{
-        wavesurferRef.current.setTime(0);
+        wavesurferRef.current.setTime(0)
     }
     const playChord = (chordName) => {
       const notes = chordMappings[chordName];
@@ -316,6 +341,12 @@ export default function Contrast() {
     // };
   
     // Clean up WaveSurfer instance on component unmount
+
+    // update chord map
+    // useEffect(()=>{
+      
+    // },[currentRegionStart])
+
     useEffect(() => {
         if(!chordSynth.current) {
           const context = new Tone.Context({ latencyHint: "interactive" });
@@ -345,8 +376,9 @@ export default function Contrast() {
               console.log("reg created")
             });
             wavesurferRef.current.plugins[0].on('region-in', (region) => {
-             
               //console.log('Entered region:', region.content);
+              console.log(region.start.toFixed(1))
+              setRegionStart(region.start.toFixed(1))
               let chord_c = region.content.textContent
               let chord = chord_c.split("\n")[0]
               setChordChordName(chord)
@@ -431,6 +463,28 @@ export default function Contrast() {
                   <div ref={timelineRef}/>
                 </div>
             </div>
+
+            <div className="card mt-4">
+                <div className="card-header">
+                    CHORD MAP 
+                </div>
+                <div class="d-flex flex-wrap chord-chart" >
+                  {chordMap.map((chord,idx)=>{
+                     let chordName = chord["chord"].replace(':maj7', 'M7').replace(':min7', 'm7')
+                     .replace(':maj', '').replace(':min', 'm').replace(':', '');
+
+                    return  <button onClick={()=>{
+                      setPlayFromTime(chord["start_time"])
+                    }} class="p-2 bd-highlight flex-chord" style={{color:"black",fontWeight:"bold", backgroundColor: (chord["start_time"]-SIGNAL_OFFSET).toFixed(1) == currentRegionStart ? "red" : convertToFlatColor(chordColor[chordName])}}>
+                      {chord["chord"]}<br/>{chord["beat"]}
+                   
+                      </button>
+                  })}
+                   
+
+                </div>
+            </div>
+                
         </div>
     );
 }

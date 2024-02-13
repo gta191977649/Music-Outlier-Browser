@@ -2,11 +2,10 @@ from madmom.audio.chroma import DeepChromaProcessor
 from madmom.features.chords import DeepChromaChordRecognitionProcessor,CRFChordRecognitionProcessor,CNNChordFeatureProcessor
 from madmom.features.key import CNNKeyRecognitionProcessor,key_prediction_to_label
 from madmom.features.downbeats import RNNDownBeatProcessor,DBNDownBeatTrackingProcessor
-
 import os
 
 # YOU SHOULD INPUT WAV FILE TO GET CHOED LABELS
-BASE_PATH = "/Users/nurupo/Desktop/dev/Music-Outlier-Browser/dataset/data/blue_oyster_cult"
+BASE_PATH = "/Users/nurupo/Desktop/dev/Music-Outlier-Browser/dataset/data/colin_meloy"
 
 
 def chord_recognition(file):
@@ -78,7 +77,7 @@ if __name__ == '__main__':
     # BEGIN MAIN PROGRAM
     for root, dirs, files in os.walk(BASE_PATH+"/wav"):
         for idx,filename in enumerate(files):
-            if os.path.splitext(filename)[1] == ".wav":
+            if os.path.splitext(filename)[1] == ".mp3" or os.path.splitext(filename)[1] == ".wav":
                 path = os.path.join(root, filename)
                 print("📃Processing: {}\n⌚️{} Left".format(path,len(files)-idx))
                 chords,beats = chord_recognition(path)

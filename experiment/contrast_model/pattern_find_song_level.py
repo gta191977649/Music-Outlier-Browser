@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import matplotlib.pyplot as plt
 import h5.hdf5_getters as h5
+import chordify.utils as chordify
 def map_music21(chord_21,name):
     map_21 = {'A': eNote.A,
               'D': eNote.D,
@@ -63,61 +64,98 @@ def getChordVectorsFromFile(PATH_CHORD):
 #TRSBHPR128F92C2C1D
 
 ARTIST = "blue_oyster_cult"
-SONG_ID = "TRPSSSL128F4267C28"
+SONG_ID = "TRYNPBH128F426E381"
 # Chord File
 #PATH_CHORD = "/Users/nurupo/Desktop/dev/Music-Outlier-Browser/dataset/data/{}/chord/{}.lab".format(ARTIST, SONG_ID)
-PATH_CHORD = "/Users/nurupo/Desktop/dev/Music-Outlier-Browser/music/final_countdown.mp3.lab"
+PATH_CHORD = "/Users/nurupo/Desktop/dev/Music-Outlier-Browser/dataset/data/similar_song/chord/蒲公英的约定.mp3_transposed.lab"
 PATH_FILE = "/Users/nurupo/Desktop/dev/Music-Outlier-Browser/dataset/data/{}/h5/{}.h5".format(ARTIST, SONG_ID)
+SONG = h5.open_h5_file_read(PATH_FILE)
+TITLE = h5.get_title(SONG)
 
 chords = getChordVectorsFromFile(PATH_CHORD)
 
 chord_name_ls = []
 chord_theta_ls = []
 chord_start_ls = []
-chord_end_ls = []
+chord_beat_ls = []
 # Loop through Chords
 for c in chords:
     chord_name_ls.append(c["chord"].name)
     chord_theta_ls.append(c["chord"].temp_theta)
     chord_start_ls.append(float(c["start"]))
-    chord_end_ls.append(float(c["beat"]))
+    chord_beat_ls.append(float(c["beat"]))
 
 df = pd.DataFrame({
     'chord_name': chord_name_ls,
     'chord_theta': chord_theta_ls,
     'start': chord_start_ls,
-    'beat': chord_end_ls
+    'beat': chord_beat_ls,
 })
-WINDOW = 16
+START_ON_DOWNBEAT = True # Set algorithm to only start search on chord that is on downbeat
+WINDOW = 16 # measures for chord progession length
 HOP_SIZE = 1  # Hop size of 1 allows overlapping windows
 matched_patterns = {}
 used_patterns = set()  # Set to keep track of unique patterns already used in a match
+cost_threshold = 1
+matched_indices = set()  # Set to keep track of indices that have been matched
 
-for i in range(0, len(chord_theta_ls) - WINDOW + 1, HOP_SIZE):
+i = 0
+while i < len(chord_theta_ls) - WINDOW + 1:
     reference_signal = chord_theta_ls[i:i + WINDOW]
     pattern_key = tuple(chord_name_ls[i:i + WINDOW])  # Convert the pattern to a tuple to use it as a dictionary key
+    # Make sure we only start from downbeats
+    if START_ON_DOWNBEAT:
+        if not chord_beat_ls[i] == 1.0:
+            i += HOP_SIZE
+            continue
 
-    if pattern_key not in used_patterns:
-        used_patterns.add(pattern_key)  # Mark this pattern as used
+    if i in matched_indices:  # Skip if this index is part of a matched pattern
+        i += HOP_SIZE
+        continue
+    if pattern_key not in matched_patterns:
+        matched_patterns[pattern_key] = {
+            'start_ref': i,
+            'end_ref': i + WINDOW - 1,
+            'matches': []
+        }
 
-        if pattern_key not in matched_patterns:
-            matched_patterns[pattern_key] = {
-                'start_ref': i,
-                'end_ref': i + WINDOW - 1,
-                'matches': []
-            }
-
-        # Start the search loop from the end of the reference signal to avoid searching the reference signal itself
-        for j in range(i + WINDOW, len(chord_theta_ls) - WINDOW + 1, HOP_SIZE):
+        # Use a while loop for dynamic control over the index j
+        j = i + WINDOW
+        while j < len(chord_theta_ls) - WINDOW + 1:
+            if j in matched_indices:  # Skip if this index is part of a matched pattern
+                j += HOP_SIZE
+                continue
+            if START_ON_DOWNBEAT:
+                if not chord_beat_ls[j] == 1.0:
+                    j += HOP_SIZE
+                    continue
             search_signal = chord_theta_ls[j:j + WINDOW]
+            path_length = len(reference_signal) + len(search_signal)
+
             cost = dtw(reference_signal, search_signal)
-            print(cost)
-            if cost == 0:
+            # normalize cost
+            cost = cost / path_length
+
+            if cost < cost_threshold:
+                print(cost)
                 matched_patterns[pattern_key]['matches'].append({
                     'start_search': j,
                     'end_search': j + WINDOW - 1
                 })
+                matched_indices.update(range(j, j + WINDOW))  # Mark these indices as matched
+                j += WINDOW  # Skip current found chord position
+            else:
+                j += HOP_SIZE  # Move to the next position
 
+        # If the current pattern has one or more matches, mark the pattern as used
+        if len(matched_patterns[pattern_key]['matches']) > 0:
+            matched_indices.update(range(i, i + WINDOW))  # Mark these indices as matched
+            i += WINDOW
+            continue
+
+    i += HOP_SIZE  # Move to the next position
+
+print("PATTEN FOUND FINISH")
 # Plotting the signal
 x_values = range(len(df))
 filtered_patterns = {pattern: details for pattern, details in sorted(matched_patterns.items(), key=lambda item: len(item[1]['matches']), reverse=True) if len(details['matches']) > 0}
@@ -161,7 +199,7 @@ for (pattern, details), ax in zip(filtered_patterns.items(), axs):
     ax.set_xticklabels(df['beat'], rotation='vertical', fontsize=8)
     ax.set_xlim(left=0, right=max(x_values))
     ax.set_ylim(min(df['chord_theta']), max(df['chord_theta']))
-    ax.legend()
+    #ax.legend()
 
 # Finalizing the plot
 plt.tight_layout()
@@ -170,4 +208,4 @@ plt.show()
 # Print All Found Matches
 for pattern, details in matched_patterns.items():
     if len(details['matches']) > 0:
-        print(pattern,len(details['matches']))
+        print(chordify.format_chord_progression(pattern,time_signature=4),len(details['matches']))

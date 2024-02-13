@@ -209,11 +209,11 @@ export default function Analysis() {
     const renderResponse = () => {
         return (
             <>
-                <WavesurferPlayer
+                {/* <WavesurferPlayer
                     height={100}
                     waveColor="blue"
                     url={URL.createObjectURL(waveFile)}
-                />
+                /> */}
                 {renderPlot("Tension Change",analysisResponse.chord_data.tension_change,"#E72222")}
                 {renderPlot("Color Change",analysisResponse.chord_data.color_change,"#00965F")}
                 {renderPlot("Theta (Chord) Change",analysisResponse.chord_data.chord_theta,"#1A43BF")}
@@ -222,9 +222,7 @@ export default function Analysis() {
 
         )
     };
-    const onReady = (ws) => {
-        setWavesurfer(ws)
-    }
+
 
     return (
       

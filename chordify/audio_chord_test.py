@@ -28,7 +28,7 @@ from madmom.features.chords import DeepChromaChordRecognitionProcessor,CRFChordR
 from madmom.features.key import CNNKeyRecognitionProcessor,key_prediction_to_label
 
 
-PATH = '../msd/beat_track.mp3'
+PATH = '../music/bic_camera_2.mp3'
 
 
 dcp = DeepChromaProcessor()

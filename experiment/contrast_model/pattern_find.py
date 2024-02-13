@@ -11,6 +11,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import h5.hdf5_getters as h5
 import matplotlib.ticker as ticker
+import chordify.utils as chordify
 
 def map_music21(chord_21,name):
     map_21 = {'A': eNote.A,
@@ -55,7 +56,7 @@ def getChordVectorsFromFile(PATH_CHORD):
                 chords.append({
                     "chord":v,
                     "start":start,
-                    "end":end,
+                    "beat":end,
                 })
     return chords
 
@@ -70,49 +71,79 @@ def findChordPattern(PATH_CHORD,PATH_FILE):
     chord_name_ls = []
     chord_theta_ls = []
     chord_start_ls = []
-    chord_end_ls = []
+    chord_beat_ls = []
     # Loop through Chords
     for c in chords:
         chord_name_ls.append(c["chord"].name)
         chord_theta_ls.append(c["chord"].temp_theta)
         chord_start_ls.append(float(c["start"]))
-        chord_end_ls.append(float(c["end"]))
+        chord_beat_ls.append(float(c["beat"]))
 
-    # df = pd.DataFrame({
-    #     'chord_name': chord_name_ls,
-    #     'chord_theta': chord_theta_ls,
-    #     'start': chord_start_ls,
-    #     'end': chord_end_ls
-    # })
-    WINDOW = 4
+    START_ON_DOWNBEAT = True
+    WINDOW = 16
     HOP_SIZE = 1  # Hop size of 1 allows overlapping windows
     matched_patterns = {}
     used_patterns = set()  # Set to keep track of unique patterns already used in a match
+    cost_threshold = 1
+    matched_indices = set()  # Set to keep track of indices that have been matched
 
-    for i in range(0, len(chord_theta_ls) - WINDOW + 1, HOP_SIZE):
+    i = 0
+    while i < len(chord_theta_ls) - WINDOW + 1:
         reference_signal = chord_theta_ls[i:i + WINDOW]
         pattern_key = tuple(chord_name_ls[i:i + WINDOW])  # Convert the pattern to a tuple to use it as a dictionary key
+        # Make sure we only start from downbeats
+        if START_ON_DOWNBEAT:
+            if not chord_beat_ls[i] == 1.0:
+                i += HOP_SIZE
+                continue
+        if i in matched_indices:  # Skip if this index is part of a matched pattern
+            i += HOP_SIZE
+            continue
 
-        if pattern_key not in used_patterns:
-            used_patterns.add(pattern_key)  # Mark this pattern as used
+        if pattern_key not in matched_patterns:
+            matched_patterns[pattern_key] = {
+                'start_ref': i,
+                'end_ref': i + WINDOW - 1,
+                'matches': []
+            }
 
-            if pattern_key not in matched_patterns:
-                matched_patterns[pattern_key] = {
-                    'start_ref': i,
-                    'end_ref': i + WINDOW - 1,
-                    'matches': []
-                }
+            # Use a while loop for dynamic control over the index j
+            j = i + WINDOW
+            while j < len(chord_theta_ls) - WINDOW + 1:
+                if j in matched_indices:  # Skip if this index is part of a matched pattern
+                    j += HOP_SIZE
+                    continue
 
-            # Start the search loop from the end of the reference signal to avoid searching the reference signal itself
-            for j in range(i + WINDOW, len(chord_theta_ls) - WINDOW + 1, HOP_SIZE):
+                if START_ON_DOWNBEAT:
+                    if not chord_beat_ls[j] == 1.0:
+                        j += HOP_SIZE
+                        continue
+
                 search_signal = chord_theta_ls[j:j + WINDOW]
+                path_length = len(reference_signal) + len(search_signal)
+
                 cost = dtw(reference_signal, search_signal)
-                if cost == 0:
+                # normalize cost
+                cost = cost / path_length
+
+                if cost < cost_threshold:
+                    print(cost)
                     matched_patterns[pattern_key]['matches'].append({
                         'start_search': j,
                         'end_search': j + WINDOW - 1
                     })
+                    matched_indices.update(range(j, j + WINDOW))  # Mark these indices as matched
+                    j += WINDOW  # Skip current found chord position
+                else:
+                    j += HOP_SIZE  # Move to the next position
 
+            # If the current pattern has one or more matches, mark the pattern as used
+            if len(matched_patterns[pattern_key]['matches']) > 0:
+                matched_indices.update(range(i, i + WINDOW))  # Mark these indices as matched
+                i += WINDOW
+                continue
+
+        i += HOP_SIZE  # Move to the next position
 
     # Print All Found Matches
 
@@ -154,20 +185,24 @@ if __name__ == '__main__':
             # if idx == 10:
             #     break
     patterns_ls = []
+
+    chord_ls = []
     songcount_ls = []
 
     for pattern in pattern_result:
         patterns_ls.append(pattern)
         songcount_ls.append(len(pattern_result[pattern]))
-        #print(pattern,len(pattern_result[pattern]))
+        chord_ls.append(chordify.format_chord_progression(pattern))
+        print(chordify.format_chord_progression(pattern),len(pattern_result[pattern]))
 
     frequency_ls = [pattern_freq_total[p] for p in patterns_ls]
     df = pd.DataFrame({
         "pattern":patterns_ls,
+        "chord":chord_ls,
         "songs":songcount_ls,
         "frequency": frequency_ls
     })
     df = df.sort_values(by='songs', ascending=False)
 
-    df.to_csv("./pattern_song.csv")
+    df.to_csv("./pattern_song.csv",index=False)
     print(df)

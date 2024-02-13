@@ -95,8 +95,16 @@ footer {
     padding-bottom: 10px;
     text-align: center;
 }
+.chord-chart{
+  // padding:5px;
+  background-color: gray;
+}
 .flex-chord {
     flex-basis: 25%;
     text-align: center;
     align-self: center;
+    border:$DARK;
+    border-width: 1px;
+    border-style: solid;
+    background-color: white;
 }

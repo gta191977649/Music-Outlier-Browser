@@ -5,9 +5,7 @@ from madmom.features.downbeats import RNNDownBeatProcessor,DBNDownBeatTrackingPr
 import os
 
 # YOU SHOULD INPUT WAV FILE TO GET CHOED LABELS
-BASE_PATH = "/Users/nurupo/Desktop/dev/Music-Outlier-Browser/dataset/data/colin_meloy"
-
-
+BASE_PATH = "/Users/nurupo/Desktop/dev/Music-Outlier-Browser/dataset/data/europe"
 def chord_recognition(file):
     # detect chord
     dcp = DeepChromaProcessor()

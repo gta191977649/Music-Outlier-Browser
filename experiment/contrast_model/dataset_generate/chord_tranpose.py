@@ -1,5 +1,4 @@
 import os.path
-
 from pychord.constants import NOTE_VAL_DICT
 from pychord import Chord
 import h5.hdf5_getters as h5

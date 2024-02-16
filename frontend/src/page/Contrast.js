@@ -19,6 +19,7 @@ import * as Tone from 'tone'
 export default function Contrast() {
     const [chord_file, setChordFile] = useState(null);
     const [waveFile, setWaveFile] = useState(null);
+    const [vectorFile,setVectorFile] = useState(null)
     const [chordMap, setChordMap] = useState([])
     const [currentRegionStart,setRegionStart] = useState(0)
     const waveformRef = useRef(null); 
@@ -28,9 +29,13 @@ export default function Contrast() {
     const regionsRef = useRef({});
 
     const [currentTime, setCurrentTime] = useState(0);
+    const [currentTimeIndex, setTimeIndex] = useState(0);
     const [currentChordName, setChordChordName] = useState("N/A");
+
+    const [vectorMap,setVectorMap] = useState([])
     const SIGNAL_OFFSET = 0.3
-    let lastEnteredRegionRef = useRef(0);
+    let lastEnteredRegionRef = useRef(0)
+
 
 
     const chordColor = {
@@ -278,6 +283,34 @@ export default function Contrast() {
     
         reader.readAsDataURL(file); // Read the file
     }
+
+    const readVectorFile = (file) => {
+      const reader = new FileReader();
+
+      reader.onload = (event) => {
+          // This will execute after the file is read
+          const base64data = event.target.result.replace(
+            'data:application/octet-stream;base64,','');
+        
+          let content = atob(base64data);
+          let lines = content.split('\n');
+          let data = lines.map((line)=>{
+            let parts = line.split(" ")
+            return parts[2]
+          })
+          console.log(data)
+          setVectorMap(data)
+          
+          
+      };
+  
+      reader.onerror = (error) => {
+          // Handle errors
+          console.log('Error: ', error);
+      };
+  
+      reader.readAsDataURL(file); // Read the file
+  }
     const handleWaveFileSelect = (event) => {
         const file = event.target.files[0];
         setWaveFile(file);
@@ -292,6 +325,11 @@ export default function Contrast() {
         
         wavesurferRef.current.load(objectURL);
     };
+    const handleVectorFileSelect = (event) => {
+      const file = event.target.files[0];
+      setVectorFile(file)
+      readVectorFile(file)
+    }
 
     const handleChordFileSelect = (event) => {
         const file = event.target.files[0];
@@ -300,7 +338,7 @@ export default function Contrast() {
     }
 
     const handlePlay=() =>{
-      wavesurferRef.current.setVolume(0.8);
+      wavesurferRef.current.setVolume(1);
       wavesurferRef.current.play();
         
     }
@@ -325,27 +363,14 @@ export default function Contrast() {
           console.log('Chord not found:', chordName);
       }
   };
-    // const checkForRegionEntry = (currentTime) => {
-    //   Object.values(regionsRef.current).forEach((region,idx) => {
-    //       if (currentTime >= region.start && currentTime <= region.end && lastEnteredRegionRef !== region.id) {
-    //         let chord = region.content.textContent
-    //         setChordChordName(chord)
-    //         playChord(chord)
-    //         console.log('Chord:', chord);
-    //         lastEnteredRegionRef = region.id
-            
-    //           // Perform your action for region entry
-    //           // Ensure you handle the case where you're continuously within the region
-    //       }
-    //   });
-    // };
-  
-    // Clean up WaveSurfer instance on component unmount
-
-    // update chord map
-    // useEffect(()=>{
-      
-    // },[currentRegionStart])
+    useEffect(()=>{
+      chordMap.forEach((chord, idx) => {
+        if ((chord["start_time"] - SIGNAL_OFFSET).toFixed(1) == currentRegionStart) {
+          setTimeIndex(idx)
+        }
+      });
+      console.log("chord update!")
+    },[currentRegionStart])
 
     useEffect(() => {
         if(!chordSynth.current) {
@@ -404,7 +429,76 @@ export default function Contrast() {
             }
         };
     }, []);
+    const renderPlot = (title,values_data,color) => {
 
+      const data = {
+          labels: values_data.map((_, index) => `${index + 1}`),
+       
+          datasets: [
+              {
+                  label: title,
+                  data: values_data,
+                  fill: false,
+                  backgroundColor: color,
+                  borderColor: color,
+                  borderWidth: 1,
+                  pointRadius: 1,
+                  tension: 0.1,
+                  stepped: true,
+              },
+          ],
+      };
+
+      const options = {
+          maintainAspectRatio: false,
+          responsive: true,
+          
+          scales: {
+              y: {
+                  beginAtZero: true
+              }
+          },
+          plugins: {
+              annotation: {
+                  annotations: {
+                      line1: {
+                          type: 'line',
+                          xMin: currentTimeIndex,
+                          xMax: currentTimeIndex,
+                          borderColor: '#e72222',
+                          borderWidth: 2,
+                      }
+                  }
+              },
+              zoom: {
+                  zoom: {
+                    wheel: {
+                      enabled: true,
+                    },
+                    pinch: {
+                      enabled: true
+                    },
+                    mode: 'xy',
+                  }
+              },
+              legend: {
+                  labels: {
+                      // This more specific font property overrides the global property
+                      font: {
+                          family:"JR",
+                          size: 14
+                      }
+                  }
+              }
+          }
+      };
+
+      return (
+          <div>
+              <Line data={data} options={options} height={200} />
+          </div>
+      );
+  }
     return (
         <div className='container mt-5'>
             <h2>対照分析</h2>
@@ -439,6 +533,20 @@ export default function Contrast() {
                     >
                         {chord_file ? `[ ${chord_file.name} ]` : "[ DROP CHORD FILE ]"}
                     </label>
+
+                    <input
+                        type="file"
+                        id="fileInput3"
+                        style={{ display: 'none' }}
+                        onChange={handleVectorFileSelect}
+                        accept=".vec"
+                    />
+                    <label
+                        htmlFor="fileInput3"
+                        style={{ textAlign: 'center', color: "#343a40", fontWeight: "bold", cursor: "pointer" }}
+                    >
+                        {vectorFile ? `[ ${vectorFile.name} ]` : "[ DROP VECTOR FILE ]"}
+                    </label>
                 </div>
 
             </div>
@@ -455,11 +563,12 @@ export default function Contrast() {
             </div>
             <div className="card mt-4">
                 <div className="card-header">
-                  コート解析:{currentChordName}
+                  コート解析:{currentChordName}|{currentTimeIndex}
                 </div>
                 <div className="card-body">
                   {/* WaveSurfer waveform container */}
-                  <div ref={waveformRef} style={{ height: '200px', marginTop: '20px' }} />
+                  <div ref={waveformRef} style={{ height: waveFile? '200px': "0px", marginTop: '20px' }} />
+                  {vectorFile ? renderPlot("Chord Phase Change",vectorMap,"blue") :""}
                   <div ref={timelineRef}/>
                 </div>
             </div>

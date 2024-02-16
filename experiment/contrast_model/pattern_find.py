@@ -66,8 +66,9 @@ def findChordPattern(PATH_CHORD,PATH_FILE):
 
     file = h5.open_h5_file_read(PATH_FILE)
     title = h5.get_title(file)
-    chords = getChordVectorsFromFile(PATH_CHORD)
+    file.close()
 
+    chords = getChordVectorsFromFile(PATH_CHORD)
     chord_name_ls = []
     chord_theta_ls = []
     chord_start_ls = []
@@ -113,7 +114,6 @@ def findChordPattern(PATH_CHORD,PATH_FILE):
                 if j in matched_indices:  # Skip if this index is part of a matched pattern
                     j += HOP_SIZE
                     continue
-
                 if START_ON_DOWNBEAT:
                     if not chord_beat_ls[j] == 1.0:
                         j += HOP_SIZE
@@ -158,7 +158,7 @@ def findChordPattern(PATH_CHORD,PATH_FILE):
 
 
 if __name__ == '__main__':
-    BASE_PATH = "/Users/nurupo/Desktop/dev/Music-Outlier-Browser/dataset/data/colin_meloy"
+    BASE_PATH = "/Users/nurupo/Desktop/dev/Music-Outlier-Browser/dataset/data/europe"
     TRANSPOSED = True
     PATH_H5_DIR = os.path.join(BASE_PATH, "h5")
 

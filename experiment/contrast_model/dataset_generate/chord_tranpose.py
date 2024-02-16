@@ -66,8 +66,9 @@ def transpose_chord_progression(h5_file,input_file, output_file, transpose_amoun
         for line in transposed_lines:
             file.write(line + "\n")
 
+
 if __name__ == '__main__':
-    BASE_PATH = "/Users/nurupo/Desktop/dev/Music-Outlier-Browser/dataset/data/colin_meloy"
+    BASE_PATH = "/Users/nurupo/Desktop/dev/Music-Outlier-Browser/dataset/data/europe_aud"
     # PATH_H5 = "/Users/nurupo/Desktop/dev/Music-Outlier-Browser/dataset/data/blue_oyster_cult/h5/TRZARJQ128F42679C9.h5"
     # PATH_CHORD = "/Users/nurupo/Desktop/dev/Music-Outlier-Browser/dataset/data/blue_oyster_cult/chord/TRZARJQ128F42679C9.lab"
 
@@ -99,10 +100,5 @@ if __name__ == '__main__':
                 output_file = PATH_CHORD.rsplit('.lab', 1)[0] + '_transposed.lab'
 
                 transpose_chord_progression(file,PATH_CHORD,output_file, transpose_amount)
+                file.close()
                 print("Processed: {}:Key:{},Mode:{},Tranpose Amount:{}".format(title,key_name,mode,transpose_amount))
-
-
-
-
-
-

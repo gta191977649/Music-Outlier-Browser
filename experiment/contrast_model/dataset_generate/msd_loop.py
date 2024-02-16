@@ -6,7 +6,7 @@ from madmom.features.key import CNNKeyRecognitionProcessor,key_prediction_to_lab
 from madmom.features.downbeats import RNNDownBeatProcessor,DBNDownBeatTrackingProcessor
 
 if __name__ == '__main__':
-    BASE_PATH = "/Users/nurupo/Desktop/dev/Music-Outlier-Browser/dataset/data/blue_oyster_cult"
+    BASE_PATH = "/Users/nurupo/Desktop/dev/Music-Outlier-Browser/dataset/data/europe"
     TRANSPOSED = True
     PATH_H5_DIR = os.path.join(BASE_PATH, "h5")
     for root, dirs, files in os.walk(PATH_H5_DIR):
@@ -20,5 +20,5 @@ if __name__ == '__main__':
                 time_signature = h5.get_time_signature(file)
                 if os.path.exists(PATH_WAV):
                     title = h5.get_title(file).decode('utf-8')
-                    print(time_signature,title)
-
+                    print(title)
+                file.close()

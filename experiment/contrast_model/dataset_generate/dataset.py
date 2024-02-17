@@ -7,7 +7,25 @@ from pychord.constants import NOTE_VAL_DICT
 
 
 INDEX_NOTE_DICT = {v: k for k, v in NOTE_VAL_DICT.items()}
+def calculate_transpose_amount(original_key, original_mode):
+    # Define target keys for Major (C) and Minor (Am)
+    target_major = "C"
+    target_minor = "A"
 
+    # Get semitone value for original key and target keys
+    original_key_val = NOTE_VAL_DICT[original_key]
+    target_major_val = NOTE_VAL_DICT[target_major]
+    target_minor_val = NOTE_VAL_DICT[target_minor]
+
+    # Calculate transpose amount based on mode
+    if original_mode == "major":  # Major
+        transpose_amount = target_major_val - original_key_val
+    elif original_mode == "minor":  # Minor
+        transpose_amount = target_minor_val - original_key_val
+    else:
+        raise ValueError("Mode should be 1 (Major) or 0 (Minor)")
+
+    return transpose_amount
 
 def write_chord_file(filename,chords,beats):
     chordsArray = []
@@ -138,7 +156,50 @@ def generateChordFile(basePath):
 
     print("ALL DONE.")
 
+def generateTransposedChordFile(basePath):
+    chord_path = os.path.join(basePath, "chord")
+    meta_file = os.path.join(basePath, "meta.csv")
+    if not os.path.exists(meta_file):
+        print("Meta file does not exist")
+        return
+
+    if not os.path.exists(chord_path):
+        os.makedirs(chord_path)
+
+    # loop all meta file and transposed its chords
+    files = pd.read_csv(meta_file)
+    for _, song in files.iterrows():
+        chord_song_path = os.path.join(chord_path, song["title"].replace(".mp3",".lab"))
+        if os.path.exists(chord_song_path):
+            key = song["key"]
+            mode = song["mode"]
+            transposed_amount = calculate_transpose_amount(key,mode)
+            # parse the chord file
+            transposed_lines = []
+            with open(chord_song_path, 'r') as file:
+                lines = file.readlines()
+            for line in lines:
+                parts = line.strip().split("\t")
+                if len(parts) == 3:
+                    start, end, chord_str = parts
+                    chord_str = chord_str.replace(":", "")
+                    try:
+                        target_key = mode == "major" and "C" or "A"
+                        transposed_chord = feature.transpose_chord(chord_str, transposed_amount,target_key)
+                        transposed_line = "\t".join([start, end, str(transposed_chord)])
+                    except ValueError as e:
+                        #print(f"Error processing chord: {chord_str}. Error: {e}")
+                        transposed_line = "\t".join([start, end, "None"])  # Placeholder for unrecognized chords
+                    transposed_lines.append(transposed_line)
+            # output transposed chords ...
+            output_path = os.path.join(chord_path, song["title"].replace(".mp3","_transposed.lab"))
+            with open(output_path, 'w') as file:
+                for line in transposed_lines:
+                    file.write(line + "\n")
+            print(output_path)
+
 if __name__ == '__main__':
     BASE_PATH = "/Users/nurupo/Desktop/dev/Music-Outlier-Browser/dataset/data/europe_aud"
     #generateDatasetMetaFile(BASE_PATH)
     #generateChordFile(BASE_PATH)
+    generateTransposedChordFile(BASE_PATH)

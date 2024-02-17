@@ -3,6 +3,7 @@ from madmom.audio.chroma import DeepChromaProcessor
 from madmom.features.downbeats import RNNDownBeatProcessor,DBNDownBeatTrackingProcessor
 from madmom.features.key import CNNKeyRecognitionProcessor,key_prediction_to_label
 from madmom.features.chords import DeepChromaChordRecognitionProcessor,CRFChordRecognitionProcessor,CNNChordFeatureProcessor
+from pychord import Chord
 
 def extract_chord(file):
     # detect chord
@@ -15,6 +16,12 @@ def extract_chord(file):
     beat_decoder = DBNDownBeatTrackingProcessor(beats_per_bar=[4], fps=100)
     beats = beat_decoder(beat_processor(file))
     return chords,beats
+
+def transpose_chord(chord_str, transpose_amount,target_scale):
+    chord = Chord(chord_str)
+    chord.transpose(transpose_amount,scale=target_scale)
+    transposed_chord = chord
+    return transposed_chord
 def extract_feature(file_path,feature):
     if feature == 'tempo':
         beats = madmom.features.beats.RNNBeatProcessor()(file_path)

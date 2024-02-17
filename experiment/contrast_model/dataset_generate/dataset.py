@@ -173,6 +173,7 @@ def generateTransposedChordFile(basePath):
         if os.path.exists(chord_song_path):
             key = song["key"]
             mode = song["mode"]
+            target_key = mode == "major" and "C" or "A"
             transposed_amount = calculate_transpose_amount(key,mode)
             # parse the chord file
             transposed_lines = []
@@ -184,7 +185,6 @@ def generateTransposedChordFile(basePath):
                     start, end, chord_str = parts
                     chord_str = chord_str.replace(":", "")
                     try:
-                        target_key = mode == "major" and "C" or "A"
                         transposed_chord = feature.transpose_chord(chord_str, transposed_amount,target_key)
                         transposed_line = "\t".join([start, end, str(transposed_chord)])
                     except ValueError as e:
@@ -196,7 +196,8 @@ def generateTransposedChordFile(basePath):
             with open(output_path, 'w') as file:
                 for line in transposed_lines:
                     file.write(line + "\n")
-            print(output_path)
+
+            print(f'✅Processed {song["title"]} from {song["key"]} {song["mode"]} to {target_key}\n{output_path}')
 
 if __name__ == '__main__':
     BASE_PATH = "/Users/nurupo/Desktop/dev/Music-Outlier-Browser/dataset/data/europe_aud"

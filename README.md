@@ -1,5 +1,6 @@
 # Music-Outlier-Browser
-An Intractative plaform allow you to browser music based on various forms
+* An Intractative plaform allow you to browser music based on various forms
+* NOTE: the code haven't organized yet, contains garbage code.
 # General Folder Strcutures
 * anlysis - all performned anlysis demos
 * demo_tasks - contains all MIR outlier related task demos

@@ -60,7 +60,7 @@ def getChordVectorsFromFile(PATH_CHORD):
     return chords
 
 if __name__ == '__main__':
-    PATH_CHORD = "/Users/nurupo/Desktop/dev/Music-Outlier-Browser/music/final_countdown.mp3.lab"
+    PATH_CHORD = "/music/final_countdown.mp3.lab"
 
     chords = getChordVectorsFromFile(PATH_CHORD)
 

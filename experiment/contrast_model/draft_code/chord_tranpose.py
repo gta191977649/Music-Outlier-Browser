@@ -77,7 +77,7 @@ if __name__ == '__main__':
             if os.path.splitext(filename)[1] == ".h5":
                 # Check if chord lab file exits
                 CHORD_FILENAME = filename.replace(".h5",".lab")
-                PATH_CHORD = os.path.join(BASE_PATH,"chord",CHORD_FILENAME)
+                PATH_CHORD = os.path.join(BASE_PATH, "chord", CHORD_FILENAME)
                 if not os.path.exists(PATH_CHORD):
                     print("ERROR! {} Chord File Is Not Found!".format(CHORD_FILENAME))
                     continue

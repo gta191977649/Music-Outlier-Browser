@@ -14,7 +14,7 @@ if __name__ == '__main__':
             if os.path.splitext(filename)[1] == ".h5":
                 CHORD_FILENAME = filename.replace(".h5", "_transposed.lab" if TRANSPOSED else ".lab")
                 FILE_NAME_WAV = filename.replace(".h5", ".wav")
-                PATH_WAV = os.path.join(BASE_PATH,"wav" ,FILE_NAME_WAV)
+                PATH_WAV = os.path.join(BASE_PATH, "wav", FILE_NAME_WAV)
                 PATH_H5_FILE = os.path.join(root, filename)
                 file = h5.open_h5_file_read(PATH_H5_FILE)
                 time_signature = h5.get_time_signature(file)

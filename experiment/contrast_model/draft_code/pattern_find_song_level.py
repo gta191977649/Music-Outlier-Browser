@@ -67,7 +67,7 @@ def getChordVectorsFromFile(PATH_CHORD):
 # SONG_ID = "TRYNPBH128F426E381"
 # Chord File
 #PATH_CHORD = "/Users/nurupo/Desktop/dev/Music-Outlier-Browser/dataset/data/{}/chord/{}.lab".format(ARTIST, SONG_ID)
-PATH_CHORD = "/Users/nurupo/Desktop/dev/Music-Outlier-Browser/music/陳奕迅 Eason Chan單車[Official MV].mp3.lab"
+PATH_CHORD = "/Users/nurupo/Desktop/dev/Music-Outlier-Browser/dataset/data/europe_aud/chord/Children Of This Time [2cKIZQOkUWY]_transposed.lab"
 #PATH_FILE = "/Users/nurupo/Desktop/dev/Music-Outlier-Browser/dataset/data/{}/h5/{}.h5".format(ARTIST, SONG_ID)
 #SONG = h5.open_h5_file_read(PATH_FILE)
 #TITLE = h5.get_title(SONG)

@@ -7,23 +7,48 @@ from pychord.constants import NOTE_VAL_DICT
 
 
 INDEX_NOTE_DICT = {v: k for k, v in NOTE_VAL_DICT.items()}
+# NOTE_VAL_DICT = {
+#     'Ab': 8, 'A': 9, 'A#': 10, 'Bb': 10, 'B': 11, 'Cb': 11, 'C': 0,
+#     'C#': 1, 'Db': 1, 'D': 2, 'D#': 3, 'Eb': 3, 'E': 4, 'F': 5,
+#     'F#': 6, 'Gb': 6, 'G': 7, 'G#': 8,
+# }
 def calculate_transpose_amount(original_key, original_mode):
-    # Define target keys for Major (C) and Minor (Am)
+    """
+     Calculate the amount needed to transpose from the original key and mode
+     to the standardized key (C for major, A for minor).
+
+     :param original_key: The starting key of the piece.
+     :param original_mode: The mode of the piece ('major' or 'minor').
+     :return: The transposition amount in semitones.
+     """
+    # Define target keys for Major (C) and Minor (A)
     target_major = "C"
     target_minor = "A"
 
+    # Ensure the original key is properly capitalized to match the dictionary
+    original_key = original_key.capitalize()
+
     # Get semitone value for original key and target keys
-    original_key_val = NOTE_VAL_DICT[original_key]
+    original_key_val = NOTE_VAL_DICT.get(original_key)
     target_major_val = NOTE_VAL_DICT[target_major]
     target_minor_val = NOTE_VAL_DICT[target_minor]
 
+    if original_key_val is None:
+        raise ValueError(f"Original key '{original_key}' is not valid.")
+
     # Calculate transpose amount based on mode
-    if original_mode == "major":  # Major
+    if original_mode.lower() == "major":
         transpose_amount = target_major_val - original_key_val
-    elif original_mode == "minor":  # Minor
+    elif original_mode.lower() == "minor":
         transpose_amount = target_minor_val - original_key_val
     else:
-        raise ValueError("Mode should be 1 (Major) or 0 (Minor)")
+        raise ValueError("Mode should be 'major' or 'minor'.")
+
+    # Normalize the transpose amount to the range [-6, 6] for minimal movement
+    if transpose_amount > 6:
+        transpose_amount -= 12
+    elif transpose_amount < -6:
+        transpose_amount += 12
 
     return transpose_amount
 
@@ -200,7 +225,7 @@ def generateTransposedChordFile(basePath):
             print(f'✅Processed {song["title"]} from {song["key"]} {song["mode"]} to {target_key}\n{output_path}')
 
 if __name__ == '__main__':
-    BASE_PATH = "/Users/nurupo/Desktop/dev/Music-Outlier-Browser/dataset/data/europe_aud"
-    #generateDatasetMetaFile(BASE_PATH)
-    #generateChordFile(BASE_PATH)
+    BASE_PATH = "/Users/nurupo/Desktop/dev/Music-Outlier-Browser/dataset/data/abba"
+    generateDatasetMetaFile(BASE_PATH)
+    generateChordFile(BASE_PATH)
     generateTransposedChordFile(BASE_PATH)

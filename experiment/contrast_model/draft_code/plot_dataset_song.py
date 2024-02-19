@@ -61,7 +61,7 @@ if __name__ == '__main__':
     # Chord File
     # PATH_CHORD = "/Users/nurupo/Desktop/dev/Music-Outlier-Browser/dataset/data/{}/chord/{}_transposed.lab".format(
     #     ARTIST, SONG_ID)
-    PATH_CHORD = "/Users/nurupo/Desktop/dev/Music-Outlier-Browser/music/final_countdown.mp3.lab"
+    PATH_CHORD = "/music/final_countdown.mp3.lab"
     PATH_FILE = "/Users/nurupo/Desktop/dev/Music-Outlier-Browser/dataset/data/{}/h5/{}.h5".format(ARTIST, SONG_ID)
     chords = getChordVectorsFromFile(PATH_CHORD)
     chord_name_ls = []

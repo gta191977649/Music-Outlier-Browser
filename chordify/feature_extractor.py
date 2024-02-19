@@ -20,6 +20,7 @@ def extract_chord(file):
 def transpose_chord(chord_str, transpose_amount,target_scale):
     chord = Chord(chord_str)
     chord.transpose(transpose_amount,scale=target_scale)
+    #chord.transpose(transpose_amount)
     transposed_chord = chord
     return transposed_chord
 def extract_feature(file_path,feature):
@@ -43,3 +44,28 @@ def extract_feature(file_path,feature):
         return key_prediction_to_label(proc),proc
 
     # if feature == "time_sig":
+
+
+def chord_to_roman(chords, is_major=True):
+    # Mapping for C major
+    major_map = {
+        'Cmaj': 'I', 'Dmin': 'ii', 'Emin': 'iii', 'Fmaj': 'IV',
+        'Gmaj': 'V', 'Amin': 'vi', 'Bdim': 'vii°'
+    }
+
+    # Mapping for A minor
+    minor_map = {
+        'Amin': 'i', 'Bdim': 'ii°', 'Cmaj': 'III', 'Dmin': 'iv',
+        'Emin': 'v', 'Fmaj': 'VI', 'Gmaj': 'VII'
+    }
+
+    roman_numerals = []
+
+    # Choose the appropriate mapping based on the key
+    chord_map = major_map if is_major else minor_map
+
+    # Convert each chord to its Roman numeral equivalent
+    for chord in chords:
+        roman_numerals.append(chord_map.get(chord, "?"))  # Use "?" for unmatched chords
+
+    return tuple(roman_numerals)

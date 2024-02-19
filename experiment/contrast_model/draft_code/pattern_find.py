@@ -80,8 +80,8 @@ def findChordPattern(PATH_CHORD,PATH_FILE):
         chord_start_ls.append(float(c["start"]))
         chord_beat_ls.append(float(c["beat"]))
 
-    START_ON_DOWNBEAT = True
-    WINDOW = 16
+    START_ON_DOWNBEAT = True  # Set algorithm to only start search on chord that is on downbeat
+    WINDOW = 16  # measures for chord progession length
     HOP_SIZE = 1  # Hop size of 1 allows overlapping windows
     matched_patterns = {}
     used_patterns = set()  # Set to keep track of unique patterns already used in a match
@@ -97,10 +97,10 @@ def findChordPattern(PATH_CHORD,PATH_FILE):
             if not chord_beat_ls[i] == 1.0:
                 i += HOP_SIZE
                 continue
+
         if i in matched_indices:  # Skip if this index is part of a matched pattern
             i += HOP_SIZE
             continue
-
         if pattern_key not in matched_patterns:
             matched_patterns[pattern_key] = {
                 'start_ref': i,
@@ -118,7 +118,6 @@ def findChordPattern(PATH_CHORD,PATH_FILE):
                     if not chord_beat_ls[j] == 1.0:
                         j += HOP_SIZE
                         continue
-
                 search_signal = chord_theta_ls[j:j + WINDOW]
                 path_length = len(reference_signal) + len(search_signal)
 
@@ -158,7 +157,7 @@ def findChordPattern(PATH_CHORD,PATH_FILE):
 
 
 if __name__ == '__main__':
-    BASE_PATH = "/Users/nurupo/Desktop/dev/Music-Outlier-Browser/dataset/data/europe"
+    BASE_PATH = "/Users/nurupo/Desktop/dev/Music-Outlier-Browser/dataset/data/europe_aud"
     TRANSPOSED = True
     PATH_H5_DIR = os.path.join(BASE_PATH, "h5")
 
@@ -199,7 +198,7 @@ if __name__ == '__main__':
     df = pd.DataFrame({
         "pattern":patterns_ls,
         "chord":chord_ls,
-        "songs":songcount_ls,
+        "associated_songs":songcount_ls,
         "frequency": frequency_ls
     })
     df = df.sort_values(by='songs', ascending=False)

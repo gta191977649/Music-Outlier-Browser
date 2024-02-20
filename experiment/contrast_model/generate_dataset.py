@@ -226,6 +226,6 @@ def generateTransposedChordFile(basePath):
 
 if __name__ == '__main__':
     BASE_PATH = "/Users/nurupo/Desktop/dev/Music-Outlier-Browser/dataset/data/akb48/"
-    #generateDatasetMetaFile(BASE_PATH)
+    generateDatasetMetaFile(BASE_PATH)
     generateChordFile(BASE_PATH)
     generateTransposedChordFile(BASE_PATH)

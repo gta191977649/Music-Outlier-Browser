@@ -53,6 +53,38 @@ def chord_to_roman(chords, is_major=True):
         'Gmaj': 'V', 'Amin': 'vi', 'Bdim': 'vii°'
     }
 
+    chromatic_chord_map_major = {
+        'Cmaj': 'I',  # Diatonic in C major
+        'C#dim': 'bii°',  # Not diatonic in C major (would be diatonic in C# harmonic/melodic minor)
+        'Dmin': 'ii',  # Diatonic in C major
+        'D#dim': 'biii°',  # Not diatonic in C major (would be diatonic in Eb harmonic/melodic minor)
+        'Emaj': 'III',  # Not diatonic in C major (E is minor in C major)
+        'Fmin': 'iv',  # Not diatonic in C major (F is major in C major)
+        'Fmaj': 'IV',  # Diatonic in C major
+        'F#dim': '#iv°',  # Not diatonic in C major (would be diatonic in F# harmonic/melodic minor)
+        'Gmaj': 'V',  # Diatonic in C major
+        'G#dim': 'bvi°',  # Not diatonic in C major (would be diatonic in Ab harmonic/melodic minor)
+        'Amin': 'vi',  # Diatonic in C major
+        'BbMaj': 'bVII',  # Not diatonic in C major (Bb is not in C major scale)
+        'Bdim': 'vii°',  # Diatonic in C major
+    }
+
+    chromatic_chord_map_minor = {
+        'Cmin': 'i',  # Diatonic in C natural minor
+        'C#dim': 'ii°',  # Not diatonic in C natural minor (would be diatonic in C harmonic/melodic minor)
+        'Ddim': 'iio',  # Diatonic in C natural minor
+        'D#maj': 'III',  # Diatonic in C natural minor
+        'Emin': 'iv',  # Not diatonic in C natural minor (E is diminished in C natural minor)
+        'Fmin': 'v',  # Diatonic in C natural minor
+        'Fmaj': 'VI',  # Diatonic in C natural minor
+        'F#dim': '#vio',  # Not diatonic in C natural minor (F# is not in C natural minor scale)
+        'Gmin': 'vii',  # Diatonic in C natural minor (but G major is often used in harmonic minor)
+        'G#maj': 'VII',  # Diatonic in C natural minor
+        'Amin': 'i',  # Not diatonic in C natural minor (A is major in C natural minor)
+        'Bbmaj': 'bVII',  # Not diatonic in C natural minor (Bb is the VII in C natural minor)
+        'Bdim': 'ii°',  # Diatonic in C harmonic minor (B natural would be part of the harmonic minor scale)
+    }
+
     # Mapping for A minor
     minor_map = {
         'Amin': 'i', 'Bdim': 'ii°', 'Cmaj': 'III', 'Dmin': 'iv',

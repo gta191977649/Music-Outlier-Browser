@@ -159,7 +159,7 @@ def summaryChordPattern(PATH_CHORD):
 
 
 if __name__ == '__main__':
-    BASE_PATH = "/Users/nurupo/Desktop/dev/Music-Outlier-Browser/dataset/data/abba"
+    BASE_PATH = "/Users/nurupo/Desktop/dev/Music-Outlier-Browser/dataset/data/europe_aud"
     TRANSPOSED = True
     PATH_CHORD = os.path.join(BASE_PATH, "chord")
     PATH_META = os.path.join(BASE_PATH, "meta.csv")

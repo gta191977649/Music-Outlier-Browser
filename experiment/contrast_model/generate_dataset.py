@@ -109,7 +109,7 @@ def process_file(file_info):
 
 def generateDatasetMetaFile(base_path):
     base_path = os.path.join(base_path,"wav")
-    output_path = os.path.join(base_path)
+    meta_file = os.path.join(base_path, "meta.csv")
     files = [(root, filename) for root, dirs, filenames in os.walk(base_path) for filename in filenames]
     total_files = len(files)
     print(f"Total files to process: {total_files}")
@@ -130,8 +130,8 @@ def generateDatasetMetaFile(base_path):
             "tempo": tempo_ls,
             "time_signature": [4]*len(id_ls),  # Assuming time_signature is 4 for all
         })
-        df.to_csv(output_path+"meta.csv", index=False)
-        print(f"\nFinished processing all files. Results saved to {output_path}.")
+        df.to_csv(meta_file, index=False)
+        print(f"\nFinished processing all files. Results saved to {meta_file}.")
     else:
         print("No files were processed. Check if the provided paths are correct and if the files are accessible.")
 
@@ -225,7 +225,7 @@ def generateTransposedChordFile(basePath):
             print(f'✅Processed {song["title"]} from {song["key"]} {song["mode"]} to {target_key}\n{output_path}')
 
 if __name__ == '__main__':
-    BASE_PATH = "/Users/nurupo/Desktop/dev/Music-Outlier-Browser/dataset/data/nogizaka46/"
-    generateDatasetMetaFile(BASE_PATH)
+    BASE_PATH = "/Users/nurupo/Desktop/dev/Music-Outlier-Browser/dataset/data/akb48/"
+    #generateDatasetMetaFile(BASE_PATH)
     generateChordFile(BASE_PATH)
     generateTransposedChordFile(BASE_PATH)

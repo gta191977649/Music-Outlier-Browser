@@ -57,8 +57,6 @@ if __name__ == '__main__':
     print("Plot all songs")
     MODE = "minor"
     TRANSPOSED = True
-
-
     BASE_PATH = "/Users/nurupo/Desktop/dev/Music-Outlier-Browser/dataset/data/abba"
     meta_path = os.path.join(BASE_PATH,"meta.csv")
     files = pd.read_csv(meta_path)

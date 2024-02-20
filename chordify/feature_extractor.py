@@ -4,7 +4,32 @@ from madmom.features.downbeats import RNNDownBeatProcessor,DBNDownBeatTrackingPr
 from madmom.features.key import CNNKeyRecognitionProcessor,key_prediction_to_label
 from madmom.features.chords import DeepChromaChordRecognitionProcessor,CRFChordRecognitionProcessor,CNNChordFeatureProcessor
 from pychord import Chord
+from contrast_model.Chord import eNote
+from contrast_model.Chord import Chord as VectorModel
 
+def map_music21(chord_21,name):
+    map_21 = {'A': eNote.A,
+              'D': eNote.D,
+              'G': eNote.G,
+              'C': eNote.C,
+              'F': eNote.F,
+              'Bb': eNote.Bb,
+              'A#': eNote.Bb,
+              'Eb': eNote.Eb,
+              'D#': eNote.Eb,
+              'G#': eNote.Ab,
+              'Ab': eNote.Ab,
+              'C#': eNote.Db,
+              'Db': eNote.Db,
+              'F#': eNote.Fsharp,
+              'Gb': eNote.Fsharp,
+              'B': eNote.B,
+              'E': eNote.E}
+    temp = []
+    for i in chord_21:
+        temp.append(map_21[i])
+
+    return VectorModel(temp,name=name)
 def extract_chord(file):
     # detect chord
     dcp = DeepChromaProcessor()
@@ -23,6 +48,30 @@ def transpose_chord(chord_str, transpose_amount,target_scale):
     #chord.transpose(transpose_amount)
     transposed_chord = chord
     return transposed_chord
+def getChordVectorsFromFile(PATH_CHORD):
+    chords = []
+    with open(PATH_CHORD, 'r') as file:
+        lines = file.readlines()
+        for line in lines:
+            # Skip the line if it starts with '#'
+            if line.startswith("#"):
+                continue
+            parts = line.strip().split("\t")
+            if len(parts) == 3:
+                start, end, chord_str = parts
+                # SKIP NONE CHORD
+                if chord_str in ["N", "None"]: continue
+                chord_str = chord_str.replace(":","")
+                c = Chord(chord_str)
+                notes = c.components()
+                v = map_music21(notes, chord_str)
+                chords.append({
+                    "chord":v,
+                    "name":chord_str,
+                    "angle":v.temp_theta,
+                    "beat":end,
+                })
+    return chords
 def extract_feature(file_path,feature):
     if feature == 'tempo':
         beats = madmom.features.beats.RNNBeatProcessor()(file_path)
@@ -71,18 +120,24 @@ def chord_to_roman(chords, is_major=True):
 
     chromatic_chord_map_minor = {
         'Cmin': 'i',  # Diatonic in C natural minor
-        'C#dim': 'ii°',  # Not diatonic in C natural minor (would be diatonic in C harmonic/melodic minor)
-        'Ddim': 'iio',  # Diatonic in C natural minor
+        'C#min': 'ii°',  # Not diatonic in C natural minor (would be diatonic in C harmonic/melodic minor)
+        'Dmin': 'ii',  # Not diatonic in C natural minor (D is diminished in C natural minor)
         'D#maj': 'III',  # Diatonic in C natural minor
-        'Emin': 'iv',  # Not diatonic in C natural minor (E is diminished in C natural minor)
-        'Fmin': 'v',  # Diatonic in C natural minor
-        'Fmaj': 'VI',  # Diatonic in C natural minor
-        'F#dim': '#vio',  # Not diatonic in C natural minor (F# is not in C natural minor scale)
-        'Gmin': 'vii',  # Diatonic in C natural minor (but G major is often used in harmonic minor)
-        'G#maj': 'VII',  # Diatonic in C natural minor
-        'Amin': 'i',  # Not diatonic in C natural minor (A is major in C natural minor)
-        'Bbmaj': 'bVII',  # Not diatonic in C natural minor (Bb is the VII in C natural minor)
-        'Bdim': 'ii°',  # Diatonic in C harmonic minor (B natural would be part of the harmonic minor scale)
+        'Emaj': 'III+',  # Not diatonic in C natural minor (E is diminished in C natural minor)
+        'Emin': 'iii',  # Not diatonic in C natural minor (E is diminished in C natural minor)
+        'Fmin': 'iv',  # Diatonic in C natural minor
+        'Fmaj': 'IV',  # Not diatonic in C natural minor (F is minor in C natural minor)
+        'F#min': '#iv°',  # Not diatonic in C natural minor (F# is not in C natural minor scale)
+        'Gmin': 'v',  # Diatonic in C natural minor
+        'Gmaj': 'V',  # Not diatonic in C natural minor (G is minor in C natural minor)
+        'G#maj': 'VI',  # Diatonic in C natural minor
+        'Abmaj': 'VI',  # Not diatonic in C natural minor (G# is raised in C harmonic/melodic minor)
+        'Amin': 'vii',  # Not diatonic in C natural minor (A is major in C harmonic minor)
+        'Amaj': 'VII',  # Not diatonic in C natural minor (A is major in C harmonic minor)
+        'Bbmin': 'vii°',  # Not diatonic in C natural minor (Bb is major in C natural minor)
+        'Bbmaj': 'bVII',  # Diatonic in C natural minor
+        'Bmin': 'vii°',  # Diatonic in C harmonic minor (B natural would be part of the harmonic minor scale)
+        'Bmaj': 'VII+',  # Not diatonic in C natural minor (B is diminished in C natural minor)
     }
 
     # Mapping for A minor
@@ -94,7 +149,8 @@ def chord_to_roman(chords, is_major=True):
     roman_numerals = []
 
     # Choose the appropriate mapping based on the key
-    chord_map = major_map if is_major else minor_map
+    #chord_map = major_map if is_major else minor_map
+    chord_map = chromatic_chord_map_major if is_major else chromatic_chord_map_minor
 
     # Convert each chord to its Roman numeral equivalent
     for chord in chords:

@@ -108,9 +108,9 @@ def process_file(file_info):
         return file_id, filename, "Error", "Error", "Error"
 
 def generateDatasetMetaFile(base_path):
-    base_path = os.path.join(base_path,"wav")
+    audio_path = os.path.join(base_path,"wav")
     meta_file = os.path.join(base_path, "meta.csv")
-    files = [(root, filename) for root, dirs, filenames in os.walk(base_path) for filename in filenames]
+    files = [(root, filename) for root, dirs, filenames in os.walk(audio_path) for filename in filenames]
     total_files = len(files)
     print(f"Total files to process: {total_files}")
 
@@ -226,6 +226,6 @@ def generateTransposedChordFile(basePath):
 
 if __name__ == '__main__':
     BASE_PATH = "/Users/nurupo/Desktop/dev/Music-Outlier-Browser/dataset/data/akb48/"
-    generateDatasetMetaFile(BASE_PATH)
+    #generateDatasetMetaFile(BASE_PATH)
     generateChordFile(BASE_PATH)
     generateTransposedChordFile(BASE_PATH)

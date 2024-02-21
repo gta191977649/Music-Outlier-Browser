@@ -17,7 +17,7 @@ if __name__ == '__main__':
     # # Show the plot with transitions
     # transistChart.showPlot()
 
-    MODE = "minor"
+    MODE = "major"
     TRANSPOSED = True
     BASE_PATH = "/Users/nurupo/Desktop/dev/Music-Outlier-Browser/dataset/data/abba"
     meta_path = os.path.join(BASE_PATH, "meta.csv")
@@ -33,9 +33,10 @@ if __name__ == '__main__':
         if os.path.exists(chord_path):
             chords = feature.getChordVectorsFromFile(chord_path)
             for chord in chords:
-                chords_ls.append(chord["name"])
+                if not chord["name"] == None:
+                    chords_ls.append(chord["name"])
 
-    transistChart = PlotChordTransition()
+    transistChart = PlotChordTransition(mode=MODE)
     current_chord = None
     for i in range(len(chords_ls)):
         if not chords_ls[i - 1]: continue

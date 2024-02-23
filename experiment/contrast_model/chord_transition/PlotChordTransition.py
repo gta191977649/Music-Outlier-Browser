@@ -1,4 +1,7 @@
 import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
+
+import matplotlib.lines as mlines
 import networkx as nx
 import numpy as np
 
@@ -150,4 +153,17 @@ class PlotChordTransition:
         plt.tight_layout()
         plt.axis('off')
         plt.gca().set_aspect('equal', adjustable='box')  # Keep the aspect ratio circular
+
+        # legend
+        connection_weight_line = mlines.Line2D([], [], color='blue', marker='_', markersize=15,
+                                               label='Connection Weight')
+        diatonic_chord_circle = mlines.Line2D([], [], color='white', marker='o', markerfacecolor='lightgreen',
+                                              markersize=10, label='Diatonic Chord', linestyle='None')
+        nondiatonic_chord_circle = mlines.Line2D([], [], color='white', marker='o', markerfacecolor='lightgrey',
+                                                 markersize=10, label='Non-Diatonic Chord', linestyle='None')
+        chord_scale_square = mlines.Line2D([], [], color='white', marker='s', markerfacecolor='lightblue',
+                                                 markersize=10, label='Chord Degrees', linestyle='None')
+        plt.legend(handles=[connection_weight_line, diatonic_chord_circle, nondiatonic_chord_circle,chord_scale_square], loc='best')
+
+
         plt.show()

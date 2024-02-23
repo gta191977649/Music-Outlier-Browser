@@ -159,10 +159,11 @@ def summaryChordPattern(PATH_CHORD):
 
 
 if __name__ == '__main__':
-    BASE_PATH = "/Users/nurupo/Desktop/dev/Music-Outlier-Browser/dataset/data/europe_aud"
+    BASE_PATH = "/Users/nurupo/Desktop/dev/Music-Outlier-Browser/dataset/data/abba"
     TRANSPOSED = True
     PATH_CHORD = os.path.join(BASE_PATH, "chord")
     PATH_META = os.path.join(BASE_PATH, "meta.csv")
+    PATH_PATTERN = os.path.join(BASE_PATH, "pattern")
 
     pattern_result = {}
     frequency_ls = []
@@ -194,10 +195,36 @@ if __name__ == '__main__':
             #     pattern_result[p].append(song_title)
             #     pattern_freq_total[p] += pattern_freq[p]
             print(f"PROCESSED: {CHORD_FILENAME}, {len(files) - idx} LEFT")
-    print(chord_pattern_summary)
+    #print(chord_pattern_summary)
 
 
+    for song in chord_pattern_summary:
+        title = song["title"]
+        mode = song["mode"]
+        patterns = song["patterns"]
 
+        pattern_ls = []
+        transition_ls = []
+        frequency_ls = []
+        for pattern in patterns:
+            pattern_ls.append(pattern["pattern"])
+            frequency_ls.append(pattern["matches"])
+            transition_buffer = []
+            current_transition = None
+            for chord in pattern["pattern"]:
+                if not chord == current_transition:
+                    transition_buffer.append(chord)
+                    current_transition = chord
+            transition_ls.append(transition_buffer)
+
+
+        df = pd.DataFrame({
+            "patterns": pattern_ls,
+            "transitions": transition_ls,
+            "frequency": frequency_ls,
+        })
+        if not os.path.exists(PATH_PATTERN): os.makedirs(PATH_PATTERN)
+        df.to_csv(os.path.join(PATH_PATTERN,title.replace(".mp3",".csv")), index=False)
     # patterns_ls = []
     #
     # chord_ls = []

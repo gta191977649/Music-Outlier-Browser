@@ -46,8 +46,9 @@ if __name__ == '__main__':
     BASE_PATH = '/Users/nurupo/Desktop/dev/Music-Outlier-Browser/dataset/music4all'
     track_file_path = os.path.join(BASE_PATH, "track.txt")
     meta_data = pd.read_csv("/Users/nurupo/Desktop/dev/Music-Outlier-Browser/dataset/music4all/id_information.csv",delimiter="\t")
+    meta_data = meta_data.sort_values(by='artist')
     meta_data = meta_data[:5]
-
+    print(meta_data)
 
     #search_download_song("Bic Camera Theme Song","/Users/nurupo/Desktop/dev/Music-Outlier-Browser/dataset/music4all/")
     for _,song in meta_data.iterrows():

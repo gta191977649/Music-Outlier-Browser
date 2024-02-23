@@ -43,7 +43,7 @@ def search_download_song(search_term,location):
 
 if __name__ == '__main__':
     SIZE = 10000 # get first 10000 data
-    BASE_PATH = '/Users/nurupo/Desktop/dev/Music-Outlier-Browser/dataset/music4all'
+    BASE_PATH = '/home/nurupo/Desktop/dev/Music-Outlier-Browser/dataset/music4all'
     track_file_path = os.path.join(BASE_PATH, "track.txt")
     meta_data = pd.read_csv("/Users/nurupo/Desktop/dev/Music-Outlier-Browser/dataset/music4all/id_information.csv",delimiter="\t")
     meta_data = meta_data.sort_values(by='artist')
@@ -51,7 +51,7 @@ if __name__ == '__main__':
     print(meta_data)
 
     #search_download_song("Bic Camera Theme Song","/Users/nurupo/Desktop/dev/Music-Outlier-Browser/dataset/music4all/")
-    for _,song in meta_data.iterrows():
+    for idx,song in meta_data.iterrows():
         title = song['song']
         artist = song['artist'].lower().strip()
         album_name = song['album_name']
@@ -60,11 +60,12 @@ if __name__ == '__main__':
         if os.path.exists(DOWNLOAD_PATH+".mp3"):
             print(f"☑️Skipping already downloaded song: {song['song']} - {song['artist']} ({id})")
             continue
-
-        print(f"⏬Downloading song: {title} - {artist} ({id})")
+        items_left = len(meta_data) - (idx + 1)  # Calculate items left
+        print(f"⏬Downloading song: {title} - {artist} ({id}) REMAIN: {items_left}")
         SEARCH_TERM = f"{title} - {album_name}"
         search_download_song(SEARCH_TERM,
                              DOWNLOAD_PATH)
 
 
+        print(f"✅ Finish! {title}-{artist}")
 

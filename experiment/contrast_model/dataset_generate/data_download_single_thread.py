@@ -47,6 +47,7 @@ if __name__ == '__main__':
     track_file_path = os.path.join(BASE_PATH, "track.txt")
     meta_data = pd.read_csv("/Users/nurupo/Desktop/dev/Music-Outlier-Browser/dataset/music4all/id_information.csv",delimiter="\t")
     meta_data = meta_data.sort_values(by='artist')
+    meta_data.to_csv("/Users/nurupo/Desktop/dev/Music-Outlier-Browser/dataset/music4all/id_information_grouped.csv",index=None)
     meta_data = meta_data[:5]
     print(meta_data)
 

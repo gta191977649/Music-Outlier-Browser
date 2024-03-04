@@ -5,6 +5,8 @@ import pandas as pd
 from tslearn.metrics import dtw_path,dtw
 import os
 from collections import defaultdict
+
+from chordify import feature_extractor as feature
 import matplotlib.patches as patches
 import matplotlib.pyplot as plt
 import numpy as np
@@ -12,8 +14,6 @@ import matplotlib.pyplot as plt
 import h5.hdf5_getters as h5
 import matplotlib.ticker as ticker
 import chordify.utils as chordify
-from chordify import feature_extractor as feature
-
 def map_music21(chord_21,name):
     map_21 = {'A': eNote.A,
               'D': eNote.D,
@@ -225,26 +225,3 @@ if __name__ == '__main__':
         })
         if not os.path.exists(PATH_PATTERN): os.makedirs(PATH_PATTERN)
         df.to_csv(os.path.join(PATH_PATTERN,title.replace(".mp3",".csv")), index=False)
-    # patterns_ls = []
-    #
-    # chord_ls = []
-    # songcount_ls = []
-    #
-    # for pattern in pattern_result:
-    #     patterns_ls.append(pattern)
-    #     songcount_ls.append(len(pattern_result[pattern]))
-    #     chord_ls.append(chordify.format_chord_progression(pattern))
-    #     print(chordify.format_chord_progression(pattern),len(pattern_result[pattern]))
-    #
-    # frequency_ls = [pattern_freq_total[p] for p in patterns_ls]
-    # df = pd.DataFrame({
-    #     "pattern": patterns_ls,
-    #     "chord": chord_ls,
-    #     "associated_songs": songcount_ls,
-    #     "frequency": frequency_ls
-    # })
-    # df = df.sort_values(by='frequency', ascending=False)
-    #
-    # OUTPUT_PATH = os.path.join(BASE_PATH,"pattern_song.csv")
-    # df.to_csv(OUTPUT_PATH,index=False)
-    # print(df)

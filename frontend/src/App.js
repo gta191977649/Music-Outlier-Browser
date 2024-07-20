@@ -11,6 +11,7 @@ import About from "./page/About"
 import Spotify from './page/Spotify';
 import Anlysis from './page/Anlysis'
 import Contrast from './page/Contrast';
+import ChordVS from './page/ChordVS'
 export default function App() {
   return (
     <div>
@@ -22,6 +23,7 @@ export default function App() {
                     <li><Link to="/spotify" className="nav-link px-2">Spotify API</Link></li>
                     <li><Link to="/anlysis" className="nav-link px-2">Anlysis</Link></li>
                     <li><Link to="/contrast" className="nav-link px-2">Contrast</Link></li>
+                    <li><Link to="/chordvs" className="nav-link px-2">Chord Visualizer</Link></li>
                     <li><Link to="/about" className="nav-link px-2">About</Link></li>
                 </ul>
             </header>
@@ -31,6 +33,7 @@ export default function App() {
                 <Route path='/spotify' element={<Spotify/>}/>
                 <Route path='/anlysis' element={<Anlysis/>}/>
                 <Route path='/contrast' element={<Contrast/>}/>
+                <Route path='/chordvs' element={<ChordVS/>}/>
             </Routes>
             <footer>Music Browser</footer>
 

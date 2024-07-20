@@ -23,7 +23,7 @@ clicks = librosa.clicks(frames=beat_frames, sr=sr, length=len(y))
 y_click = y + clicks
 
 # Save the audio with clicks
-sf.write('beat_tracking_test.wav', y_click, sr)
+sf.write('music/konayuki.mp3', y_click, sr)
 
 # Segment the audio signal into beats
 segments = [y[start:end] for start, end in zip(beat_samples[:-1], beat_samples[1:])]

@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.3.0",
     "@testing-library/user-event": "^13.5.0",
@@ -16,6 +17,7 @@
     "echarts": "^5.3.3",
     "echarts-for-react": "^3.0.2",
     "i": "^0.3.7",
+    "jsfive": "^0.3.14",
     "linspace": "^1.0.2",
     "node-sass": "^7.0.1",
     "normal-distribution": "^1.1.1",

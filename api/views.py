@@ -15,8 +15,12 @@ import outlier.outlier
 from outlier.outlier import Outlier
 from contrast_model.Contrast import *
 from chordify.Chordify import *
+from outlier.structure import *
+from outlier.novetly import *
 import numpy as np
 import music21
+import io
+from django.http import StreamingHttpResponse
 
 
 def dictfetchall(cursor):
@@ -98,6 +102,28 @@ def search(request):
     # }
     # return JsonResponse(data)
 
+class StructureUploadView(APIView):
+    parser_classes = [MultiPartParser, FormParser]
+    def post(self, request, *args, **kwargs):
+        serializer = AudioFileSerializer(data=request.data)
+        if serializer.is_valid():
+            uploaded_file = request.FILES.get('file')
+            #file_hash = calculate_file_hash(uploaded_file)
+            if uploaded_file:
+                tmp = io.BytesIO(uploaded_file.read())
+                peaks_lag_time,ssm,nov,peaks_lag,feature_rate = detect_novelty(tmp)
+                return Response({
+                    "novelty_peaks_time": peaks_lag_time,
+                    "novelty_curve": nov,
+                    "novelty_peaks": peaks_lag,
+                    #"ssm":ssm,
+                    "feature_rate": feature_rate,
+
+                }, status=200)
+
+            return Response("ERROR", status=400)
+        else:
+            return Response(serializer.errors, status=400)
 
 class MidiFileUploadView(APIView):
     parser_classes = [MultiPartParser, FormParser]

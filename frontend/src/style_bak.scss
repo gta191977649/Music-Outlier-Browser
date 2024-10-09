@@ -1,0 +1,110 @@
+
+//$primary: #f39800;
+@import "~bootstrap/scss/bootstrap";
+
+
+@font-face {
+    font-family: 'JR';
+    src: local("JR"), url(./font/JNR-SB-Font.ttf) format('truetype');
+}
+
+body {
+    margin: 0px;
+    padding:0px;
+    font-family: "JR";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+$DARK: #343a40;
+.card {
+    border-radius: 0px;
+    border-width: 2px;
+    border-color: $DARK;
+    box-shadow: 5px 5px 0px -1px$DARK;
+
+}
+.card-header {
+    font-size: 20px;
+    background-color: transparent;
+    border-color: $DARK;
+    border-width: 2px;
+    padding: 5px;
+    border-radius: 0px !important;
+
+}
+
+
+.side-bar .card {
+    margin: 10px;
+  }
+  
+  .features-bage:hover {
+    background-color: #f39800 !important;
+    cursor: pointer;
+  }
+  
+  .badge {
+    margin-left: 2px;
+    margin-right: 2px;
+  }
+  
+  header {
+    background-color: #f39800;
+    height: 55px;
+    padding-left: 20px;
+    padding-right: 20px;
+    display: flex;
+    flex-direction: row;
+    color: black;
+
+  }
+  .logo {
+    line-height: 55px;
+    font-weight: bold;
+    font-size: 25px;
+  }
+  
+  .header-nav li {
+    float: left;
+    line-height: 55px;
+    list-style: none;
+  }
+  .header-nav li a{
+    
+  }
+  
+  .tracks-items:hover{
+    background-color: #f39800;
+    cursor: pointer;
+  }
+  
+  .chart-full {
+    width:"100%";
+    height:"800px";
+  }
+  .btn-custom {
+    border-width: 1px;
+    border-color: $DARK;
+    border-radius: 0%;
+    box-shadow: 5px 5px 0px -1px$DARK;
+  }
+
+footer {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    text-align: center;
+}
+.chord-chart{
+  // padding:5px;
+  background-color: gray;
+}
+.flex-chord {
+    flex-basis: 25%;
+    text-align: center;
+    align-self: center;
+    border:$DARK;
+    border-width: 1px;
+    border-style: solid;
+    background-color: white;
+}

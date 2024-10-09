@@ -1,4 +1,3 @@
-
 //$primary: #f39800;
 @import "~bootstrap/scss/bootstrap";
 
@@ -10,20 +9,24 @@
 
 body {
     margin: 0px;
-    padding:0px;
-    font-family: "JR";
+    padding: 0px;
+    font-family: "JR"; 
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    background-image: linear-gradient(#000000, #272D33);
+    color: white;
+    min-height: 100vh;
 }
 
 $DARK: #343a40;
+
 .card {
     border-radius: 0px;
     border-width: 2px;
     border-color: $DARK;
     box-shadow: 5px 5px 0px -1px$DARK;
-
 }
+
 .card-header {
     font-size: 20px;
     background-color: transparent;
@@ -31,80 +34,181 @@ $DARK: #343a40;
     border-width: 2px;
     padding: 5px;
     border-radius: 0px !important;
-
 }
-
 
 .side-bar .card {
     margin: 10px;
-  }
-  
-  .features-bage:hover {
+}
+
+.features-bage:hover {
     background-color: #f39800 !important;
     cursor: pointer;
-  }
-  
-  .badge {
+}
+
+.badge {
     margin-left: 2px;
     margin-right: 2px;
-  }
-  
-  header {
-    background-color: #f39800;
-    height: 55px;
+}
+
+header {
+    background-color: #010101;
+    border-top-color: #0F0F0F;
+    border-bottom-color: #33B5E5;
     padding-left: 20px;
     padding-right: 20px;
     display: flex;
     flex-direction: row;
-    color: black;
+    color: white;
+    height: 58px;
+    border-style: solid none;
+    border-width: 1px 0 2px;
+    font-size: 16px;
+}
 
-  }
-  .logo {
+.logo {
     line-height: 55px;
     font-weight: bold;
     font-size: 25px;
-  }
-  
-  .header-nav li {
+}
+
+.header-nav li {
     float: left;
     line-height: 55px;
     list-style: none;
-  }
-  .header-nav li a{
-    
-  }
-  
-  .tracks-items:hover{
+}
+
+.header-nav li a:hover {
+    background-color: #33B5E5;
+}
+
+.tracks-items:hover {
     background-color: #f39800;
     cursor: pointer;
-  }
-  
-  .chart-full {
-    width:"100%";
-    height:"800px";
-  }
-  .btn-custom {
+}
+
+.chart-full {
+    width: "100%";
+    height: "800px";
+}
+
+.btn-custom {
     border-width: 1px;
     border-color: $DARK;
     border-radius: 0%;
     box-shadow: 5px 5px 0px -1px$DARK;
-  }
+}
 
 footer {
     padding-top: 10px;
     padding-bottom: 10px;
     text-align: center;
 }
-.chord-chart{
-  // padding:5px;
-  background-color: gray;
+
+.chord-chart {
+    // padding:5px;
+    background-color: gray;
 }
+
 .flex-chord {
     flex-basis: 25%;
     text-align: center;
     align-self: center;
-    border:$DARK;
+    border: $DARK;
     border-width: 1px;
     border-style: solid;
     background-color: white;
 }
+
+/* App.css */
+
+/* Sidebar styles */
+.sidebar {
+    height: 100%;
+    width: 250px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: #111;
+    overflow-x: hidden;
+    transition: 0.5s;
+    padding-top: 60px;
+    z-index: 1000;
+}
+
+.sidebar a {
+    padding: 10px 15px;
+    text-decoration: none;
+    font-size: 18px;
+    color: #818181;
+    display: block;
+    transition: 0.3s;
+}
+
+.sidebar a:hover {
+    color: #f1f1f1;
+}
+
+.sidebar .closebtn {
+    position: absolute;
+    top: 10px;
+    right: 25px;
+    font-size: 36px;
+    margin-left: 50px;
+}
+
+.openbtn {
+    font-size: 20px;
+    cursor: pointer;
+    background-color: #111;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+}
+
+.openbtn:hover {
+    background-color: #444;
+}
+
+/* Main content */
+#main {
+    transition: margin-left .5s;
+    padding: 16px;
+    margin-left: 260px;
+    /* Same width as the sidebar */
+}
+
+.collapsed {
+    margin-left: 0;
+}
+
+.color-primary {
+    color: #33B5E5;
+}
+
+button, *[role="button"], input[type="button"], input[type="submit"], input[type="reset"] {
+    background-color: #3D3D3D;
+    background-color: rgba(153, 153, 153, 0.4);
+    border-left-color: #3B3B3B;
+    border-left-color: rgba(0, 0, 0, 0.04);
+    border-right-color: #3B3B3B;
+    border-right-color: rgba(0, 0, 0, 0.04);
+    border-top-color: #656565;
+    border-top-color: rgba(193, 193, 193, 0.31);
+    border-bottom-color: #2E2E2E;
+    border-bottom-color: rgba(0, 0, 0, 0.24);
+    -webkit-box-shadow: 0 1px 0 0 rgba(0, 0, 0, 0.08);
+    -moz-box-shadow: 0 1px 0 0 rgba(0, 0, 0, 0.08);
+    box-shadow: 0 1px 0 0 rgba(0, 0, 0, 0.08);
+    color: #FFFFFF;
+    
+}
+input[type="range"], progress {
+    height: 2px;
+    margin: 8px 6px;
+    border-style: none;
+    border-width: 0;
+    outline-style: none;
+    outline-width: 0;
+    overflow: visible;
+}
+
